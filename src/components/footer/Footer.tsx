@@ -21,6 +21,7 @@ import ColorLensRoundedIcon from "@mui/icons-material/ColorLensRounded";
 
 export default function ColorInversionFooter() {
   const [color, setColor] = React.useState<ColorPaletteProp>("neutral");
+
   return (
     <>
       <footer>
@@ -35,7 +36,7 @@ export default function ColorInversionFooter() {
             }),
             flexGrow: 1,
             p: 2,
-            borderRadius: { xs: 0, sm: "sm" },
+            borderRadius: 0,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
