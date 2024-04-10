@@ -6,7 +6,7 @@ import logo from '@/images/logo/3d.png';
 
 const Header = () => {
   return (
-    <nav className="bg-[#121212] p-4 flex justify-between items-center">
+    <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
         <a className="text-white hover:text-gray-300" href="#">
           Home
