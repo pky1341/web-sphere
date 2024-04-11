@@ -1,13 +1,17 @@
 import Image from "next/image";
 import Carausel from "@/components/ui/Carausel";
-import img1 from "@/";
-const allImage:Image[]=[
-  
+
+const allImage:string[]=[
+  '/images/photos/1t.jpg',
+  '/images/photos/2t.jpg',
+  '/images/photos/3t.jpg',
+  '/images/photos/4t.jpg',
+  '/images/photos/5t.jpg',
 ];
 export default function Home() {
   return (
     <main>
-      <Carausel/>
+      <Carausel images={allImage} />
     </main>
   );
 }

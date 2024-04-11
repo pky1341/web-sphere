@@ -1,25 +1,36 @@
 "use client";
-import Container from '@mui/material/Container';
-import { Box } from '@mui/material';
+import React, { useState, useEffect, useRef } from "react";
+import Container from "@mui/material/Container";
+import Image from "next/image";
+import { Box, Button, IconButton } from "@mui/material";
+import { NavigateBefore, NavigateNext } from "@mui/icons-material";
 
-
-const Carausel=()=>{
-   return (
-    <>
-    <Container maxWidth="md">
-      <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        transition: 'transform 0.5s ease',
-        transform: `translateX(-${currentIndex * 100}%)`,
-      }}
-      >
-         
-      </Box>
-    </Container>
-    </>
-   );
+interface imgType {
+  images: string[];
 }
+
+const Carausel: React.FC<imgType> = ({ images }) => {
+  const [index, setIndex] = useState(0);
+  return (
+    <>
+      <Container maxWidth="md">
+        <Box className="flex justify-center items-center">
+          <IconButton>
+            <NavigateBefore />
+          </IconButton>
+          <Image
+            src={images[index]}
+            alt="not found"
+            layout="responsive"
+            width={300} 
+            className="mx-auto"
+          />
+          <IconButton>
+            <NavigateNext />
+          </IconButton>
+        </Box>
+      </Container>
+    </>
+  );
+};
 export default Carausel;
