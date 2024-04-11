@@ -3,7 +3,6 @@ import React from 'react';
 import { Button, IconButton, Menu, MenuItem, TextField } from '@mui/material';
 import Image from 'next/image';
 import logo from '@/images/logo/3d.png';
-
 const Header = () => {
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
@@ -14,7 +13,7 @@ const Header = () => {
         <div className="group inline-block relative">
           <a className="text-white hover:text-gray-300 inline-flex items-center" href="#">
             Courses
-            <IconButton name="keyboard_arrow_down" size="small" className="ml-1">
+            <IconButton name="keyboard_arrow_down" size="small" className="ml-1" disableRipple>
               <i className="fas fa-heart" />
             </IconButton>
           </a>
@@ -43,7 +42,7 @@ const Header = () => {
       </div>
       <div className="flex items-center space-x-4">
         <div className="group inline-block relative text-white">
-          <IconButton name="search" size="small" className="text-white">
+          <IconButton name="search" size="small" className="text-white" disableRipple>
             <i className="fas fa-heart" />
           </IconButton>
           <TextField
@@ -52,13 +51,13 @@ const Header = () => {
             type="text"
           />
         </div>
-        <IconButton name="wb_sunny" size="small" className="text-white">
+        <IconButton name="wb_sunny" size="small" className="text-white" disableRipple>
           <i className="fas fa-heart" />
         </IconButton>
         <IconButton name="person" size="small" className="text-white">
           <i className="fas fa-heart" />
         </IconButton>
-        <Button color="primary" variant="contained">
+        <Button color="primary" variant="contained" disableRipple>
           Sign Up
         </Button>
       </div>

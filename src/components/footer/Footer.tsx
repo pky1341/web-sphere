@@ -54,7 +54,7 @@ export default function ColorInversionFooter() {
                 const nextColorIndex = colors.indexOf(color) + 1;
                 setColor(colors[nextColorIndex] ?? colors[0]);
               }}
-            >
+              >
               <ColorLensRoundedIcon fontSize="small" />
             </IconButton>
             <Divider orientation="vertical" />

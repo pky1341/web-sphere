@@ -19,7 +19,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      
       <body className={inter.className}>
         <Container maxWidth="xl" className="px-0">
         <Header/>
