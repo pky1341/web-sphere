@@ -33,10 +33,9 @@ const Carousel: React.FC<imgType> = ({ images }) => {
     setIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
   useEffect(() => {
-    const handleResize = () => {
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const handleResize = () => {};
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -47,16 +46,17 @@ const Carousel: React.FC<imgType> = ({ images }) => {
   }, [images.length]);
 
   return (
-    <Box className="w-full h-screen relative">
+    <Box className="w-full h-64 relative">
       <StyledIconButton onClick={prevImg} className="left-0 z-10">
         <ArrowBackIosNew style={{ fontSize: "40px" }} />
       </StyledIconButton>
       <Image
         src={images[index]}
         alt="not found"
-        layout="fill"
-        objectFit="cover"
-        priority={false}
+        fill
+        style={{
+          objectFit: "cover",
+        }}
       />
       <StyledIconButton onClick={nextImg} className="right-0 z-10">
         <ArrowForwardIos style={{ fontSize: "40px" }} />
