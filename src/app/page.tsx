@@ -1,12 +1,16 @@
-import Image from "next/image";
+import {StaticImageData} from "next/image";
 import Carausel from "@/components/ui/Carausel";
-
-const allImage:string[]=[
-  '/images/photos/1t.jpg',
-  '/images/photos/2t.jpg',
-  '/images/photos/3t.jpg',
-  '/images/photos/4t.jpg',
-  '/images/photos/5t.jpg',
+import img1 from "@/images/photos/1t.jpeg";
+import img2 from "@/images/photos/2t.jpeg";
+import img3 from "@/images/photos/3t.jpeg";
+import img4 from "@/images/photos/4t.jpeg";
+import img5 from "@/images/photos/5t.jpeg";
+const allImage:StaticImageData[]=[
+  img1,
+  img2,
+  img3,
+  img4,
+  img5,
 ];
 export default function Home() {
   return (
