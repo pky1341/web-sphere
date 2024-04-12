@@ -7,6 +7,7 @@ import img4 from "@/images/photos/4t.jpeg";
 import img5 from "@/images/photos/5t.jpeg";
 import img6 from "@/images/photos/6t.png";
 import img7 from "@/images/photos/7t.png";
+import Cards from "@/components/ui/Cards";
 const allImage: StaticImageData[] = [img1, img2, img3, img4, img5, img6,img7];
 const ctnImg: StaticImageData[]=[img7];
 import Content from "@/components/ui/Content";
@@ -21,6 +22,7 @@ export default function Home() {
       imgWidth={500}
       imgHeight={300}
       />
+      <Cards/>
     </main>
   );
 }
