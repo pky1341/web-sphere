@@ -1,9 +1,18 @@
 "use client";
-import React from 'react';
+import React,{useState}from 'react';
 import { Button, IconButton, Menu, MenuItem, TextField } from '@mui/material';
 import Image from 'next/image';
 import logo from '@/images/logo/3d.png';
+import SignUp from '@/components/forms/SignUp';
+
 const Header = () => {
+  const [openSignUpModal,setOpenSignUpModal]=useState(false);
+  const openForm=()=>{
+    setOpenSignUpModal(true);
+  }
+  const closeForm=()=>{
+    setOpenSignUpModal(false);
+  }
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
@@ -57,9 +66,13 @@ const Header = () => {
         <IconButton name="person" size="small" className="text-white">
           <i className="fas fa-heart" />
         </IconButton>
-        <Button color="primary" variant="contained" disableRipple>
+        <Button color="primary" variant="outlined" disableRipple>
+          Login
+        </Button>
+        <Button color="primary" variant="contained" onClick={openForm} >
           Sign Up
         </Button>
+        <SignUp isOpen={openSignUpModal} onClose={closeForm} />
       </div>
     </nav>
   );

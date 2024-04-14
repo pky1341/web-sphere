@@ -32,5 +32,11 @@ body {
     text-wrap: balance;
   }
 } 
+.modal {
+  @apply fixed inset-0 z-50 flex items-center justify-center;
+}
 
+.modal-overlay {
+  @apply fixed inset-0 bg-gray-900 bg-opacity-50;
+}
  
