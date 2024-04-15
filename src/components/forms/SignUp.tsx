@@ -22,17 +22,26 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         ariaHideApp={false}
       >
         <Box className="bg-white rounded-lg shadow-lg p-6">
-          <Typography variant="h5" className="mb-4">
+          <Typography variant="h5" className="mb-2">
             Sign Up
           </Typography>
           <form>
             <TextField
-              label="Name"
+              label="First Name"
               name="name"
               // value={formData.name}
               // onChange={handleChange}
               required
-              className="mb-4"
+              className="mb-2"
+              fullWidth
+            />
+            <TextField
+              label="last Name"
+              name="name"
+              // value={formData.name}
+              // onChange={handleChange}
+              required
+              className="mb-2"
               fullWidth
             />
             <TextField
@@ -42,7 +51,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               // value={formData.email}
               // onChange={handleChange}
               required
-              className="mb-4"
+              className="mb-2"
               fullWidth
             />
             <TextField
@@ -52,24 +61,34 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               // value={formData.password}
               // onChange={handleChange}
               required
-              className="mb-4"
+              className="mb-2"
+              fullWidth
+            />
+            <TextField
+              label="confirm Password"
+              name="confirm password"
+              type="password"
+              // value={formData.password}
+              // onChange={handleChange}
+              required
+              className="mb-2"
               fullWidth
             />
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              className="mt-4 w-full"
+              className="mt-2 w-full"
             >
               Sign Up
             </Button>
           </form>
-          <Divider className="mb-8 relative">
+          <Divider className="mb-4 relative">
             <span className="bg-white px-2 absolute left-1/2 -translate-x-1/2">
               or
             </span>
           </Divider>
-          <Box className="flex justify-around mb-4">
+          <Box className="flex justify-around mb-2">
             <Button
               variant="contained"
               color="primary"
@@ -91,7 +110,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               Facebook
             </Button>
           </Box>
-          <Box className="flex justify-around mb-4">
+          <Box className="flex justify-around mb-2">
             <Button
               variant="contained"
               color="primary"
