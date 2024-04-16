@@ -5,13 +5,61 @@ import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import axios from "axios";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { CheckBox } from "@mui/icons-material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import { signIn } from "next-auth/react";
+
+const dataValidation = z.object({
+  FirstName: z.string().min(1, "First Name is Required"),
+  LastName: z.string().min(1, "Last Name is Required"),
+  Email: z.string().email("Invalid Email"),
+  Password: z.string().min(8, "Password must be at least 8 characters"),
+  ConfirmPassword: z.string().min(1, "Please confirm your password"),
+});
 
 interface signUpFormProps {
   isOpen: boolean;
   onClose: () => void;
 }
 const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
-  // console.log(isOpen);
+  const [showPassword, setShowPassword] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(dataValidation),
+  });
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        console.log(response);
+        alert("user succesfully created");
+      } else {
+        alert("failed to create user");
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const handleShowPassword = () => {
+    setShowPassword((show) => !show);
+  };
   return (
     <>
       <Modal
@@ -25,51 +73,59 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
           <Typography variant="h5" className="mb-2">
             Sign Up
           </Typography>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
               label="First Name"
-              name="name"
-              // value={formData.name}
-              // onChange={handleChange}
+              {...register("FirstName")}
+              error={Boolean(errors.FirstName)}
               required
               className="mb-2"
               fullWidth
             />
             <TextField
-              label="last Name"
-              name="name"
-              // value={formData.name}
-              // onChange={handleChange}
+              label="Last Name"
+              {...register("LastName")}
+              error={Boolean(errors.LastName)}
               required
               className="mb-2"
               fullWidth
             />
             <TextField
               label="Email"
-              name="email"
               type="email"
-              // value={formData.email}
-              // onChange={handleChange}
+              {...register("Email")}
+              error={Boolean(errors.Email)}
               required
               className="mb-2"
               fullWidth
             />
             <TextField
               label="Password"
-              name="password"
-              type="password"
-              // value={formData.password}
-              // onChange={handleChange}
+              type={showPassword ? "text" : "password"}
+              {...register("Password")}
+              error={Boolean(errors.Password)}
               required
               className="mb-2"
               fullWidth
+              inputProps={{
+                endadornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               label="confirm Password"
-              name="confirm password"
               type="password"
-              // value={formData.password}
-              // onChange={handleChange}
+              {...register("ConfirmPassword")}
+              error={Boolean(errors.ConfirmPassword)}
               required
               className="mb-2"
               fullWidth
