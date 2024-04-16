@@ -15,13 +15,17 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import { signIn } from "next-auth/react";
+import Swal from 'sweetalert2';
 
 const dataValidation = z.object({
   FirstName: z.string().min(1, "First Name is Required"),
   LastName: z.string().min(1, "Last Name is Required"),
   Email: z.string().email("Invalid Email"),
-  Password: z.string().min(8, "Password must be at least 8 characters"),
+  Password: z.string().min(8, "Password must be at least 8 characters").regex(/(?=.*[0-9])/, "Password must contain a number"),
   ConfirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.Password === data.ConfirmPassword, {
+  message: "Passwords do not match",
+  path: ["ConfirmPassword"],
 });
 
 interface signUpFormProps {
@@ -38,6 +42,15 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
     resolver: zodResolver(dataValidation),
   });
   const onSubmit = async (data: any) => {
+    if (data.Password !== data.ConfirmPassword) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Passwords do not match'
+      });
+      return;
+    }
+
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
@@ -47,13 +60,26 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         body: JSON.stringify(data),
       });
       if (response.ok) {
-        console.log(response);
-        alert("user succesfully created");
+        Swal.fire(
+          'Success',
+          'User successfully created',
+          'success'
+        )
+        onClose();
       } else {
-        alert("failed to create user");
+        const errorData = await response.json();
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: `Failed to create user: ${errorData.message}`
+        });
       }
     } catch (error) {
-      alert(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `An error occurred: ${error}`
+      });
     }
   };
 
@@ -78,6 +104,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               label="First Name"
               {...register("FirstName")}
               error={Boolean(errors.FirstName)}
+              helperText={errors.FirstName?.message}
               required
               className="mb-2"
               fullWidth
@@ -86,6 +113,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               label="Last Name"
               {...register("LastName")}
               error={Boolean(errors.LastName)}
+              helperText={errors.LastName?.message}
               required
               className="mb-2"
               fullWidth
@@ -95,6 +123,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               type="email"
               {...register("Email")}
               error={Boolean(errors.Email)}
+              helperText={errors.Email?.message}
               required
               className="mb-2"
               fullWidth
@@ -104,11 +133,12 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               type={showPassword ? "text" : "password"}
               {...register("Password")}
               error={Boolean(errors.Password)}
+              helperText={errors.Password?.message}
               required
               className="mb-2"
               fullWidth
-              inputProps={{
-                endadornment: (
+              InputProps={{
+                endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
@@ -122,10 +152,11 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               }}
             />
             <TextField
-              label="confirm Password"
+              label="Confirm Password"
               type="password"
               {...register("ConfirmPassword")}
               error={Boolean(errors.ConfirmPassword)}
+              helperText={errors.ConfirmPassword?.message}
               required
               className="mb-2"
               fullWidth
