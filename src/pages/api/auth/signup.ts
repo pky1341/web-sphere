@@ -5,7 +5,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function handler(req:NextApiRequest,res:NextApiResponse){
     if (req.method==="POST") {
         const {FirstName,LastName,Email,Password}=req.body;
-        const hashedPassword=await bcrypt.hash(Password,16);
+        const salt=await bcrypt.genSalt(10);
+        const hashedPassword=await bcrypt.hash(Password,salt);
         try {
             const user=await prisma.user.create({
                 data:{
