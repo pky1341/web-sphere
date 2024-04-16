@@ -71,7 +71,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         Swal.fire({
           icon: 'error',
           title: 'Failed',
-          text: `Failed to create user: ${errorData.message}`
+          text: `Failed to create user: ${errorData}`
         });
       }
     } catch (error) {

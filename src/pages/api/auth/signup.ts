@@ -4,23 +4,21 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req:NextApiRequest,res:NextApiResponse){
     if (req.method==="POST") {
-        const {FirstName,LastName,Email,Password}=req.body;
-        const salt=await bcrypt.genSalt(10);
-        const hashedPassword=await bcrypt.hash(Password,salt);
+        const {firstName, lastName, email, password} = req.body;
+        console.log(req.body.firstName);
+        // const salt=await bcrypt.genSalt(10);
+        // const hashedPassword=await bcrypt.hash(Password,salt);
         try {
             const user=await prisma.user.create({
                 data:{
-                    firstName:FirstName,
-                    lastName:LastName,
-                    email:Email,
-                    password:hashedPassword
+                    firstName:firstName,
+                    lastName:lastName,
+                    email:email,
+                    password:password
                 }
             });
-            console.log("hello guys");
-            res.status(200).json({Message:"User created successfully"});
+            res.status(200).json({message:"User created successfully"});
         } catch (error) {
-            console.log(error);
-            console.log("hi gys");
             res.status(500).json({error:"Failed to create user"});
         }
     } else {
