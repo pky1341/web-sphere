@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { Box, Button, TextField, Typography, Divider } from "@mui/material";
+import { Box, Button, TextField, Typography, Divider, CircularProgress } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -34,6 +33,7 @@ interface signUpFormProps {
 }
 const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -42,12 +42,14 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
     resolver: zodResolver(dataValidation),
   });
   const onSubmit = async (data: any) => {
+    setLoading(true);
     if (data.Password !== data.ConfirmPassword) {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: 'Passwords do not match'
       });
+      setLoading(false);
       return;
     }
 
@@ -81,6 +83,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         text: `An error occurred: ${error}`
       });
     }
+    setLoading(false);
   };
 
   const handleShowPassword = () => {
@@ -166,8 +169,9 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               variant="contained"
               color="primary"
               className="mt-2 w-full"
+              disabled={loading}
             >
-              Sign Up
+              {loading ? <CircularProgress size={24} /> : "Sign Up"}
             </Button>
           </form>
           <Divider className="mb-4 relative">

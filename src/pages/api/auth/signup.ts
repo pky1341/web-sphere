@@ -1,27 +1,58 @@
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { NextApiRequest, NextApiResponse } from "next";
+import { IncomingForm } from "formidable";
+import { resolve } from "path";
+import { rejects } from "assert";
 
-export default async function handler(req:NextApiRequest,res:NextApiResponse){
-    if (req.method==="POST") {
-        const {firstName, lastName, email, password} = req.body;
-        console.log(req.body.firstName);
-        // const salt=await bcrypt.genSalt(10);
-        // const hashedPassword=await bcrypt.hash(Password,salt);
-        try {
-            const user=await prisma.user.create({
-                data:{
-                    firstName:firstName,
-                    lastName:lastName,
-                    email:email,
-                    password:password
-                }
+interface RequestBody {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const { method } = req;
+  switch (method) {
+    case "POST":
+      try {
+        const form = new IncomingForm();
+        const fields = await new Promise<{ fields: any, files: any }>(
+          (resolve, reject) => {
+            form.parse(req, (err, fields, files) => {
+              if (err) return reject(err);
+              resolve({ fields, files });
             });
-            res.status(200).json({message:"User created successfully"});
-        } catch (error) {
-            res.status(500).json({error:"Failed to create user"});
-        }
-    } else {
-        res.status(405).json({error:"mathod not allowed"});
-    }
+          }
+        );
+        const { firstName, lastName, email, password } = fields.fields;
+        //  const salt = await bcrypt.genSalt(10);
+        // const hashedPassword = await bcrypt.hash(password, salt);
+        const user = await prisma.user.create({
+          data: {
+            firstName,
+            lastName,
+            email,
+            password,
+          },
+        });
+        res.status(200).json({ message: "User created successfully" });
+      } catch (error) {
+        res.status(500).json({ error: "Failed to create user" });
+      }
+      break;
+    default:
+      res.status(405).json({ error: "method not allowed" });
+      break;
+  }
 }
