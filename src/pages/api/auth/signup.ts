@@ -35,16 +35,17 @@ export default async function handler(
             });
           }
         );
-        const { firstName, lastName, email, password } = fields.fields;
-        const passwdStr = String(password);
+        const { FirstName, LastName, Email, Password, ConfirmPassword } =
+          fields.fields;
+        const passwdStr = String(Password);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(passwdStr, salt);
         const user = await prisma.user.create({
           data: {
-            firstName:String(firstName),
-            lastName:String(lastName),
-            email:String(email),
-            password:hashedPassword,
+            firstName: String(FirstName),
+            lastName: String(LastName),
+            email: String(Email),
+            password: hashedPassword,
           },
         });
         res.status(200).json({ message: "User created successfully" });
