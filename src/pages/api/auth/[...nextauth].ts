@@ -1,11 +1,42 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
+import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
+import nodemailer from "nodemailer";
+// import { string } from "zod";
+const emailTransport = nodemailer.createTransport({
+  host: process.env.EMAIL_SERVER_HOST,
+  port: process.env.EMAIL_SERVER_PORT,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_SERVER_USER,
+    pass: process.env.EMAIL_SERVER_PASSWORD,
+  },
+});
 
+const sendVerificationRequest = async ({
+  identifier,
+  url,
+}: {
+  identifier: string;
+  url: string;
+}) => {
+  await emailTransport.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: identifier,
+    subject: "Sign Up Verification",
+    html: `<p>Please click the link to verify your email: <a href="${url}">${url}</a></p>`,
+  });
+};
 const options: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    EmailProvider({
+      server: process.env.EMAIL_SERVER_HOST,
+      from: process.env.EMAIL_FROM,
+      sendVerificationRequest,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -25,7 +56,7 @@ const options: NextAuthOptions = {
         if (!user || user.password !== password) {
           return null;
         }
-        return {...user,id:user.id.toString()};
+        return { ...user, id: user.id.toString() };
       },
     }),
   ],
