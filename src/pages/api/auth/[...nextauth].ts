@@ -19,7 +19,7 @@ const sendVerificationRequest = async ({
   identifier,
   url,
 }: {
-  identifier: string;
+  identifier:string;
   url: string;
 }) => {
   console.log(`Sending verification email to ${identifier}`);

@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { IncomingForm } from "formidable";
+import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
 
@@ -25,7 +26,7 @@ export default async function handler(
   const { method } = req;
   switch (method) {
     case "POST":
-      try {
+      // try {
         const form = new IncomingForm();
         const fields = await new Promise<{ fields: any; files: any }>(
           (resolve, reject) => {
@@ -48,10 +49,11 @@ export default async function handler(
             password: hashedPassword,
           },
         });
+        await signIn("email", { email: String(Email) });
         res.status(200).json({ message: "User created successfully" });
-      } catch (error) {
-        res.status(500).json({ error: "Failed to create user" });
-      }
+      // } catch (error) {
+      //   res.status(500).json({ error: "Failed to create user" });
+      // }
       break;
     default:
       res.status(405).json({ error: "method not allowed" });
