@@ -14,9 +14,11 @@ import SignUp from "@/components/forms/SignUp";
 import ListItemText from "@mui/material/ListItemText";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Logout, Settings } from "@mui/icons-material";
-import { useSession } from "next-auth/react";
 
-const Header = () => {
+interface HeaderProps{
+  session:Boolean
+}
+const Header:React.FC<HeaderProps> = ({session}) => {
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
   const openForm = () => {
     setOpenSignUpModal(true);
@@ -31,10 +33,7 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  // let isLoggedIn: Boolean;
-  // isLoggedIn = true;
   const [menuOpen, setMenuOpen] = useState(false);
-  const {data:session}=useSession();
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
