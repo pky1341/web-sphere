@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
-import { Box, Button, TextField, Typography, Divider, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -14,18 +21,23 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import { signIn } from "next-auth/react";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
-const dataValidation = z.object({
-  FirstName: z.string().min(1, "First Name is Required"),
-  LastName: z.string().min(1, "Last Name is Required"),
-  Email: z.string().email("Invalid Email"),
-  Password: z.string().min(8, "Password must be at least 8 characters").regex(/(?=.*[0-9])/, "Password must contain a number"),
-  ConfirmPassword: z.string().min(1, "Please confirm your password"),
-}).refine((data) => data.Password === data.ConfirmPassword, {
-  message: "Passwords do not match",
-  path: ["ConfirmPassword"],
-});
+const dataValidation = z
+  .object({
+    FirstName: z.string().min(1, "First Name is Required"),
+    LastName: z.string().min(1, "Last Name is Required"),
+    Email: z.string().email("Invalid Email"),
+    Password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/(?=.*[0-9])/, "Password must contain a number"),
+    ConfirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.Password === data.ConfirmPassword, {
+    message: "Passwords do not match",
+    path: ["ConfirmPassword"],
+  });
 
 interface signUpFormProps {
   isOpen: boolean;
@@ -45,9 +57,9 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
     setLoading(true);
     if (data.Password !== data.ConfirmPassword) {
       Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'Passwords do not match'
+        icon: "error",
+        title: "Oops...",
+        text: "Passwords do not match",
       });
       setLoading(false);
       return;
@@ -62,25 +74,26 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         body: JSON.stringify(data),
       });
       if (response.ok) {
-        Swal.fire(
-          'Success',
-          'User successfully created',
-          'success'
-        )
+        await signIn("credentials", {
+          email: data.Email,
+          password: data.Password,
+          redirect: true,
+        });
+        Swal.fire("Success", "User successfully created", "success");
         onClose();
       } else {
         const errorData = await response.json();
         Swal.fire({
-          icon: 'error',
-          title: 'Failed',
-          text: `Failed to create user`
+          icon: "error",
+          title: "Failed",
+          text: `Failed to create user`,
         });
       }
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: `An error occurred: ${error}`
+        icon: "error",
+        title: "Error",
+        text: `An error occurred: ${error}`,
       });
     }
     setLoading(false);
