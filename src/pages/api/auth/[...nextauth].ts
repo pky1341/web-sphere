@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
+
 // import { string } from "zod";
 const emailTransport = nodemailer.createTransport({
   host: process.env.EMAIL_SERVER_HOST,
@@ -19,7 +20,7 @@ const sendVerificationRequest = async ({
   identifier,
   url,
 }: {
-  identifier:string;
+  identifier: string;
   url: string;
 }) => {
   console.log(`Sending verification email to ${identifier}`);
@@ -31,8 +32,13 @@ const sendVerificationRequest = async ({
   });
 };
 const options: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
+    EmailProvider({
+      server: process.env.EMAIL_SERVER_HOST,
+      from: process.env.EMAIL_FROM,
+      sendVerificationRequest,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -55,12 +61,8 @@ const options: NextAuthOptions = {
         return { ...user, id: user.id.toString() };
       },
     }),
-    EmailProvider({
-      server: process.env.EMAIL_SERVER_HOST,
-      from: process.env.EMAIL_FROM,
-      sendVerificationRequest,
-    }),
   ],
+  adapter: PrismaAdapter(prisma),
   pages: {
     signIn: "/auth/signin",
   },

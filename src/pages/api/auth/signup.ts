@@ -49,7 +49,7 @@ export default async function handler(
             password: hashedPassword,
           },
         });
-        await signIn("email", { email: String(Email) });
+        // await signIn("email", { email: String(Email) });
         res.status(200).json({ message: "User created successfully" });
       // } catch (error) {
       //   res.status(500).json({ error: "Failed to create user" });
