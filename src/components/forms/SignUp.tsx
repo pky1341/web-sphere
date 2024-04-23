@@ -77,7 +77,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         await signIn("credentials", {
           email: data.Email,
           password: data.Password,
-          redirect: true,
+          redirect: false,
         });
         Swal.fire("Success", "User successfully created", "success");
         onClose();

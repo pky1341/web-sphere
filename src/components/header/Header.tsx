@@ -14,11 +14,13 @@ import SignUp from "@/components/forms/SignUp";
 import ListItemText from "@mui/material/ListItemText";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Logout, Settings } from "@mui/icons-material";
+import {withSession} from '@/utils/withSession';
+export const getServerSideProps = withSession;
 
 interface HeaderProps{
-  session:Boolean
+  session:any
 }
-const Header:React.FC<HeaderProps> = ({session}) => {
+const Header:React.FC<HeaderProps>  = ({session }) => {
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
   const openForm = () => {
     setOpenSignUpModal(true);
@@ -34,6 +36,8 @@ const Header:React.FC<HeaderProps> = ({session}) => {
     setAnchorEl(null);
   };
   const [menuOpen, setMenuOpen] = useState(false);
+  // const {props:session}=withSession();
+  const { sessi } = props;
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">

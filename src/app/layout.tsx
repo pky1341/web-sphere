@@ -15,15 +15,16 @@ const inter = Inter({ subsets: ["latin"] });
 // };
 
 export default function RootLayout({
-  children,
+  children,session
 }: Readonly<{
   children: React.ReactNode;
+  session:any;
 }>) {
   return (
     <html lang="en">
       <body className={inter.className}>
         <Container maxWidth="xl" className="px-0">
-          <Header session={false} />
+          <Header session={session} />
           {children}
           <Footer />
         </Container>
