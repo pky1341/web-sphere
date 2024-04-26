@@ -7,10 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "maildev": "maildev --web 8025 --smtp 1025",
     "inquisition": "ts-inquisition --fix",
     "prisma:generate": "npx prisma generate --schema=./src/prisma/schema.prisma",
-    "prisma:migrate": "npx prisma migrate dev --schema=./src/prisma/schema.prisma",
-    "mailhog": "mailhog"
+    "prisma:migrate": "npx prisma migrate dev --schema=./src/prisma/schema.prisma"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -50,6 +50,7 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
+    "maildev": "^2.1.0",
     "postcss": "^8",
     "prisma": "^5.12.1",
     "tailwindcss": "^3.3.0",

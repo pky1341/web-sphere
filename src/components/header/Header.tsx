@@ -37,7 +37,7 @@ const Header:React.FC<HeaderProps>  = ({session }) => {
   };
   const [menuOpen, setMenuOpen] = useState(false);
   // const {props:session}=withSession();
-  const { sessi } = props;
+  // const { sessi } = props;
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">

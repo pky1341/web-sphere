@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { IncomingForm } from "formidable";
+import { sendVerificationRequest } from '@/utils/emailReq';
 import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
@@ -49,7 +50,11 @@ export default async function handler(
             password: hashedPassword,
           },
         });
-        // await signIn("email", { email: String(Email) });
+        const verificationUrl = `http://localhost:3000/verify-email?token=${user.id}`;
+        await sendVerificationRequest({
+          identifier: String(Email),
+          url: verificationUrl,
+        });
         res.status(200).json({ message: "User created successfully" });
       // } catch (error) {
       //   res.status(500).json({ error: "Failed to create user" });
