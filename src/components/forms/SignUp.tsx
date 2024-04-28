@@ -124,7 +124,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
                 label="First Name"
                 {...register("FirstName")}
                 error={Boolean(errors.FirstName)}
-                helperText={errors.FirstName?.message}
+                helperText={`${errors.FirstName?.message || ''}`}
                 required
                 className="mb-2"
                 fullWidth
@@ -133,7 +133,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
                 label="Last Name"
                 {...register("LastName")}
                 error={Boolean(errors.LastName)}
-                helperText={errors.LastName?.message}
+                helperText={`${errors.FirstName?.message || ''}`}
                 required
                 className="mb-2"
                 fullWidth
@@ -143,7 +143,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
                 type="email"
                 {...register("Email")}
                 error={Boolean(errors.Email)}
-                helperText={errors.Email?.message}
+                helperText={`${errors.FirstName?.message || ''}`}
                 required
                 className="mb-2"
                 fullWidth
@@ -153,7 +153,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
                 type={showPassword ? "text" : "password"}
                 {...register("Password")}
                 error={Boolean(errors.Password)}
-                helperText={errors.Password?.message}
+                helperText={`${errors.FirstName?.message || ''}`}
                 required
                 className="mb-2"
                 fullWidth
@@ -176,7 +176,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
                 type="password"
                 {...register("ConfirmPassword")}
                 error={Boolean(errors.ConfirmPassword)}
-                helperText={errors.ConfirmPassword?.message}
+                helperText={`${errors.FirstName?.message || ''}`}
                 required
                 className="mb-2"
                 fullWidth

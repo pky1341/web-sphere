@@ -18,6 +18,7 @@ import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import SendIcon from "@mui/icons-material/Send";
 import ColorLensRoundedIcon from "@mui/icons-material/ColorLensRounded";
+import Image from "next/image";
 
 export default function ColorInversionFooter() {
   const [color, setColor] = React.useState<ColorPaletteProp>("neutral");
@@ -54,7 +55,7 @@ export default function ColorInversionFooter() {
                 const nextColorIndex = colors.indexOf(color) + 1;
                 setColor(colors[nextColorIndex] ?? colors[0]);
               }}
-              >
+            >
               <ColorLensRoundedIcon fontSize="small" />
             </IconButton>
             <Divider orientation="vertical" />
@@ -102,10 +103,20 @@ export default function ColorInversionFooter() {
                 minHeight={80}
                 sx={{ flexBasis: { xs: 200, md: "initial" } }}
               >
-                <img
-                  alt=""
-                  src="/static/blog/mui-product-comparison/ecosystem.png"
-                />
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <Image
+                    alt="Ecosystem"
+                    src="/static/blog/mui-product-comparison/ecosystem.png"
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
               </AspectRatio>
               <CardContent>
                 <Typography level="body-sm">
