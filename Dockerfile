@@ -1,5 +1,5 @@
-# Use the official Node.js 20 image as the base
-FROM node:20-alpine
+# Use the official Node.js 20 image as the base for the build stage
+FROM node:20-alpine as builder
 
 # Set the working directory
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN npm config set fetch-retry-maxtimeout 60000
 RUN npm config set registry https://registry.npmjs.org/
 
 # Update npm to the latest version
-RUN npm install -g npm@10.5.0
+RUN npm install -g npm@latest
 
 # Install dependencies
 RUN npm install
@@ -25,11 +25,21 @@ COPY . .
 # Build the Next.js app
 RUN npm run build
 
-# Install serve to run the built app
-RUN npm install -g serve
+# Use the official Node.js 20 image as the base for the production stage
+FROM node:20-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built application from the builder stage
+COPY --from=builder /app/out ./build
+COPY --from=builder /app/package*.json ./
+
+# Install production dependencies
+RUN npm install --production
 
 # Expose the port the app will run on
 EXPOSE 3000
 
 # Start the app
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["next", "start"]
