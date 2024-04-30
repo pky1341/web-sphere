@@ -32,7 +32,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy the built application from the builder stage
-COPY --from=builder /app/out ./build
+COPY --from=builder /app/.next ./build
 COPY --from=builder /app/package*.json ./
 
 # Install production dependencies

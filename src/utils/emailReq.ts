@@ -13,18 +13,23 @@ const emailTransport = nodemailer.createTransport({
   },
 });
 
-export const sendVerificationRequest = async ({
+export const sendVerificationCode = async ({
   identifier,
-  url,
+  code,
 }: {
   identifier: string;
-  url: string;
+  code: string;
 }) => {
-  console.log(`Sending verification email to ${identifier}`);
+  console.log(`Sending verification code to ${identifier}`);
   await emailTransport.sendMail({
     from: process.env.EMAIL_FROM,
     to: identifier,
-    subject: "Sign Up Verification",
-    html: `<p>Please click the link to verify your email: <a href="${url}">${url}</a></p>`,
+    subject: "Your Verification Code",
+    html: `<p>Dear User,</p>
+           <p>Thank you for choosing our service. Your verification code is: <strong>${code}</strong></p>
+           <p>Please enter this code in the app to verify your email address.</p>
+           <p>Thank you for your cooperation.</p>
+           <p>Best regards,</p>
+           <p>The Team</p>`,
   });
 };
