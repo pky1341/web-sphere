@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
-
+import { SendVerificationRequestParams } from "next-auth/providers/email";
+import otpGenerator from "otp-generator";
 const prisma = new PrismaClient();
 
 const emailTransport = nodemailer.createTransport({
@@ -13,20 +14,20 @@ const emailTransport = nodemailer.createTransport({
   },
 });
 
-export const sendVerificationCode = async ({
+export const sendVerificationRequest = async ({
   identifier,
-  code,
-}: {
-  identifier: string;
-  code: string;
-}) => {
-  console.log(`Sending verification code to ${identifier}`);
+  url,
+  token,
+  provider,
+}: SendVerificationRequestParams) => {
+  const otp = otpGenerator.generate(4, { upperCase: false, specialChars: false } as any);
+  console.log(`otp:--${otp}`);
   await emailTransport.sendMail({
     from: process.env.EMAIL_FROM,
     to: identifier,
     subject: "Your Verification Code",
     html: `<p>Dear User,</p>
-           <p>Thank you for choosing our service. Your verification code is: <strong>${code}</strong></p>
+           <p>Thank you for choosing our service. Your verification code is: <strong>${otp}</strong></p>
            <p>Please enter this code in the app to verify your email address.</p>
            <p>Thank you for your cooperation.</p>
            <p>Best regards,</p>
