@@ -14,6 +14,10 @@ interface RequestBody {
   email: string;
   password: string;
 }
+interface SendVerificationRequestParams {
+  identifier: string;
+  otp: number; 
+}
 export const config = {
   api: {
     bodyParser: false,
@@ -66,8 +70,8 @@ export default async function handler(
         } as any);
         await sendVerificationRequest({
           identifier: String(Email),
-          otp: otp,
-        });
+          otp: Number(otp),
+        }:SendVerificationRequestParams);
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {
         res.status(500).json({ error: "Failed to create user" });
