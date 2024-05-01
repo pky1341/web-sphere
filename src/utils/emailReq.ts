@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
 import { SendVerificationRequestParams } from "next-auth/providers/email";
-import otpGenerator from "otp-generator";
 const prisma = new PrismaClient();
 
 const emailTransport = nodemailer.createTransport({
@@ -14,14 +13,13 @@ const emailTransport = nodemailer.createTransport({
   },
 });
 
-export const sendVerificationRequest = async ({
-  identifier,
-  url,
-  token,
-  provider,
-}: SendVerificationRequestParams) => {
-  const otp = otpGenerator.generate(4, { upperCase: false, specialChars: false } as any);
-  console.log(`otp:--${otp}`);
+export const sendVerificationRequest = async (
+  params: SendVerificationRequestParams
+) => {
+  const { identifier, otp } = params as unknown as {
+    identifier: string;
+    otp: number;
+  };
   await emailTransport.sendMail({
     from: process.env.EMAIL_FROM,
     to: identifier,

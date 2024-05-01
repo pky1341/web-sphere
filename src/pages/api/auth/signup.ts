@@ -6,6 +6,7 @@ import { sendVerificationRequest } from "@/utils/emailReq";
 import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
+import otpGenerator from "otp-generator";
 
 interface RequestBody {
   firstName: string;
@@ -13,7 +14,6 @@ interface RequestBody {
   email: string;
   password: string;
 }
-
 export const config = {
   api: {
     bodyParser: false,
@@ -58,10 +58,15 @@ export default async function handler(
             password: hashedPassword,
           },
         });
-        const verificationUrl = `http://localhost:3000/verify-email?token=${user.id}`;
+        const otp = otpGenerator.generate(4, {
+          digits: true,
+          upperCase: false,
+          specialChars: false,
+          alphabets: false,
+        } as any);
         await sendVerificationRequest({
           identifier: String(Email),
-          url: verificationUrl,
+          otp: otp,
         });
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {
