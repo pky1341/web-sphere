@@ -20,6 +20,7 @@ export const sendVerificationRequest = async (
     identifier: string;
     otp: number;
   };
+  
   await emailTransport.sendMail({
     from: process.env.EMAIL_FROM,
     to: identifier,

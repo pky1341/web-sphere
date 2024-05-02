@@ -16,7 +16,7 @@ interface RequestBody {
 }
 interface SendVerificationRequestParams {
   identifier: string;
-  otp: number; 
+  otp: number;
 }
 export const config = {
   api: {
@@ -28,6 +28,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  function generateNumericOTP(length: number): string {
+    let otp = "";
+    for (let i = 0; i < length; i++) {
+      otp += Math.floor(Math.random() * 10); 
+    }
+    return otp;
+  }
   const { method } = req;
   switch (method) {
     case "POST":
@@ -62,16 +69,11 @@ export default async function handler(
             password: hashedPassword,
           },
         });
-        const otp = otpGenerator.generate(4, {
-          digits: true,
-          upperCase: false,
-          specialChars: false,
-          alphabets: false,
-        } as any);
+        const otp = generateNumericOTP(4);
         await sendVerificationRequest({
           identifier: String(Email),
           otp: Number(otp),
-        }:SendVerificationRequestParams);
+        } as SendVerificationRequestParams);
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {
         res.status(500).json({ error: "Failed to create user" });

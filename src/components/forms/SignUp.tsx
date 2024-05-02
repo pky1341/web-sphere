@@ -119,6 +119,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
           {showOTPForm ? (
             <OtpForm onSubmit={handleOTPSubmit} />
           ) : (
+            <>
             <form onSubmit={handleSubmit(onSubmit)}>
               <TextField
                 label="First Name"
@@ -191,7 +192,6 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
                 {loading ? <CircularProgress size={24} /> : "Sign Up"}
               </Button>
             </form>
-          )}
           <Divider className="mb-4 relative">
             <span className="bg-white px-2 absolute left-1/2 -translate-x-1/2">
               or
@@ -241,6 +241,8 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
               GitHub
             </Button>
           </Box>
+          </>
+          )}
         </Box>
       </Modal>
     </>
