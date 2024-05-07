@@ -16,9 +16,10 @@ const emailTransport = nodemailer.createTransport({
 export const sendVerificationRequest = async (
   params: SendVerificationRequestParams
 ) => {
-  const { identifier, otp } = params as unknown as {
+  const { identifier, otp,url } = params as unknown as {
     identifier: string;
     otp: number;
+    url:string;
   };
   
   await emailTransport.sendMail({

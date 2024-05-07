@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
 import otpGenerator from "otp-generator";
+import { SendVerificationRequestParams } from 'next-auth/providers/email';
 
 interface RequestBody {
   firstName: string;
@@ -17,6 +18,11 @@ interface RequestBody {
 interface SendVerificationRequestParams {
   identifier: string;
   otp: number;
+  url: string;
+  expires?: number;
+  provider?: string;
+  token?: string;
+  theme?: string;
 }
 export const config = {
   api: {
@@ -31,7 +37,7 @@ export default async function handler(
   function generateNumericOTP(length: number): string {
     let otp = "";
     for (let i = 0; i < length; i++) {
-      otp += Math.floor(Math.random() * 10); 
+      otp += Math.floor(Math.random() * 10);
     }
     return otp;
   }
@@ -69,10 +75,17 @@ export default async function handler(
             password: hashedPassword,
           },
         });
+        const expires = new Date();
+        expires.setMinutes(expires.getMinutes() + 30);
         const otp = generateNumericOTP(4);
         await sendVerificationRequest({
           identifier: String(Email),
           otp: Number(otp),
+          url: "",
+          expires: expires.getTime(),
+          provider: "",
+          token: "",
+          theme: "",
         } as SendVerificationRequestParams);
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {

@@ -77,7 +77,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         // });
         // Swal.fire("Success", "User successfully created", "success");
         setShowOTPForm(true);
-        onClose();
+        // onClose();
       } else {
         const errorData = await response.json();
         Swal.fire({
