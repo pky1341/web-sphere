@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
-import { SendVerificationRequestParams } from "next-auth/providers/email";
+
+import {CustomVerificationRequestParams} from "@/pages/api/auth/signup";
+
 const prisma = new PrismaClient();
 
 const emailTransport = nodemailer.createTransport({
@@ -14,12 +16,11 @@ const emailTransport = nodemailer.createTransport({
 });
 
 export const sendVerificationRequest = async (
-  params: SendVerificationRequestParams
+  params: CustomVerificationRequestParams
 ) => {
-  const { identifier, otp,url } = params as unknown as {
+  const { identifier, otp } = params as unknown as {
     identifier: string;
     otp: number;
-    url:string;
   };
   
   await emailTransport.sendMail({

@@ -7,7 +7,7 @@ import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
 import otpGenerator from "otp-generator";
-import { SendVerificationRequestParams } from 'next-auth/providers/email';
+import {generateNumericOTP} from '@/utils/generateOtp';
 
 interface RequestBody {
   firstName: string;
@@ -15,12 +15,13 @@ interface RequestBody {
   email: string;
   password: string;
 }
-interface SendVerificationRequestParams {
+export interface CustomVerificationRequestParams {
   identifier: string;
   otp: number;
-  url: string;
-  expires?: number;
+  url?: string;
+  expires?: Date;
   provider?: string;
+  baseUrl?:string;
   token?: string;
   theme?: string;
 }
@@ -34,13 +35,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  function generateNumericOTP(length: number): string {
-    let otp = "";
-    for (let i = 0; i < length; i++) {
-      otp += Math.floor(Math.random() * 10);
-    }
-    return otp;
-  }
   const { method } = req;
   switch (method) {
     case "POST":
@@ -77,16 +71,16 @@ export default async function handler(
         });
         const expires = new Date();
         expires.setMinutes(expires.getMinutes() + 30);
-        const otp = generateNumericOTP(4);
         await sendVerificationRequest({
           identifier: String(Email),
-          otp: Number(otp),
+          otp: Number(generateNumericOTP(4)),
           url: "",
-          expires: expires.getTime(),
+          expires: expires,
           provider: "",
+          baseUrl:"",
           token: "",
           theme: "",
-        } as SendVerificationRequestParams);
+        } as CustomVerificationRequestParams);
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {
         res.status(500).json({ error: "Failed to create user" });

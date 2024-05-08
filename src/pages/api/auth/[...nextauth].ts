@@ -1,18 +1,28 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
-import EmailProvider from "next-auth/providers/email";
+import EmailProvider, { SendVerificationRequestParams } from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import { sendVerificationRequest } from '@/utils/emailReq';
+import {generateNumericOTP} from '@/utils/generateOtp';
 // import { string } from "zod";
+
+const sendVerificationRequestWrapper=async (params:SendVerificationRequestParams):Promise<void>=>{
+    const {identifier,url,token,provider}=params;
+    const customParams={
+      identifier:identifier,
+      otp:Number(generateNumericOTP(4)),
+    }
+    await sendVerificationRequest(customParams);
+}
 const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     EmailProvider({
       server: process.env.EMAIL_SERVER_HOST,
       from: process.env.EMAIL_FROM,
-      sendVerificationRequest,
+      sendVerificationRequest:sendVerificationRequestWrapper,
     }),
     CredentialsProvider({
       name: "Credentials",
