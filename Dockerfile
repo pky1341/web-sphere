@@ -5,7 +5,7 @@ FROM node:20-alpine as builder
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package*.json./
 
 # Increase the timeout for npm
 RUN npm config set fetch-retry-maxtimeout 60000
@@ -19,8 +19,8 @@ RUN npm install -g npm@latest
 # Install dependencies
 RUN npm install
 
-# Copy the entire project
-COPY . .
+# Correctly copy the entire project
+COPY..
 
 # Build the Next.js app
 RUN npm run build
@@ -32,8 +32,10 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy the built application from the builder stage
-COPY --from=builder /app/.next ./build
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next./build
+
+# Copy package.json and package-lock.json for production dependencies
+COPY --from=builder /app/package*.json./
 
 # Install production dependencies
 RUN npm install --production
@@ -42,4 +44,4 @@ RUN npm install --production
 EXPOSE 3000
 
 # Start the app
-CMD ["next", "start"]
+CMD ["npm", "start"]
