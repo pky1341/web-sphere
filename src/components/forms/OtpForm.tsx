@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
+import Swal from "sweetalert2";
 
 interface OTPProps {
   onSubmit: (otp: string) => void;
@@ -10,6 +11,14 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
   const [otp, setOtp] = useState<string>("");
   const [resendDisabled, setResendDisabled] = useState(false);
   const [otpExpiryTime, setOtpExpiryTime] = useState(5 * 60);
+  const [otpSessionId, setOtpSessionId] = useState<string>("");
+  useEffect(()=>{
+    setOtpSessionId("nbfnfmgh");
+    const storedOtp=sessionStorage.getItem(otpSessionId);
+    if(storedOtp){
+      setOtp(storedOtp);
+    }
+  },[]);
   useEffect(() => {
     let timer: NodeJS.Timeout | undefined = undefined;
     if (otpExpiryTime > 0) {
@@ -35,6 +44,13 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
   const handleChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setOtp(value);
+      if(value===otp){
+        Swal.fire({
+          title: "Email Verification Successful",
+          icon: "success",
+          text: "Your email has been successfully verified. You can now log in."
+        });
+      }
     }
   };
   const handleResendOTP = () => {

@@ -6,8 +6,7 @@ import { sendVerificationRequest } from "@/utils/emailReq";
 import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
-import otpGenerator from "otp-generator";
-import {generateNumericOTP} from '@/utils/generateOtp';
+
 
 interface RequestBody {
   firstName: string;
@@ -15,21 +14,13 @@ interface RequestBody {
   email: string;
   password: string;
 }
-export interface CustomVerificationRequestParams {
-  identifier: string;
-  otp: number;
-  url?: string;
-  expires?: Date;
-  provider?: string;
-  baseUrl?:string;
-  token?: string;
-  theme?: string;
-}
+
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
 
 export default async function handler(
   req: NextApiRequest,
@@ -69,18 +60,7 @@ export default async function handler(
             password: hashedPassword,
           },
         });
-        const expires = new Date();
-        expires.setMinutes(expires.getMinutes() + 30);
-        await sendVerificationRequest({
-          identifier: String(Email),
-          otp: Number(generateNumericOTP(4)),
-          url: "",
-          expires: expires,
-          provider: "",
-          baseUrl:"",
-          token: "",
-          theme: "",
-        } as CustomVerificationRequestParams);
+        await sendVerificationRequest(String(Email));
         res.status(200).json({ message: "User created successfully" });
       } catch (error) {
         res.status(500).json({ error: "Failed to create user" });

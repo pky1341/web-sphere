@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
+import { generateNumericOTP } from '@/utils/generateOtp';
+import {v4 as uuidv4} from 'uuid';
 
-import {CustomVerificationRequestParams} from "@/pages/api/auth/signup";
 
 const prisma = new PrismaClient();
 
@@ -15,17 +16,15 @@ const emailTransport = nodemailer.createTransport({
   },
 });
 
-export const sendVerificationRequest = async (
-  params: CustomVerificationRequestParams
-) => {
-  const { identifier, otp } = params as unknown as {
-    identifier: string;
-    otp: number;
-  };
-  
+export const sendVerificationRequest = async (email: string) => {
+  let store:{[key:string]:number}= {};
+  let otp=Number(generateNumericOTP(4));
+  const otpSessionId=uuidv4();
+  // sessionStorage.setItem(otpSessionId,String(otp));
+  store[otpSessionId]=otp;
   await emailTransport.sendMail({
     from: process.env.EMAIL_FROM,
-    to: identifier,
+    to: email,
     subject: "Your Verification Code",
     html: `<p>Dear User,</p>
            <p>Thank you for choosing our service. Your verification code is: <strong>${otp}</strong></p>
