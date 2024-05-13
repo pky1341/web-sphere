@@ -24,3 +24,13 @@ model User {
 
     @@map("users")
 }
+model OtpDetails {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  otp       Int
+  expiryAt  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("otpdetails")
+}

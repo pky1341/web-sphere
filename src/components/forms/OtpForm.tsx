@@ -7,32 +7,56 @@ interface OTPProps {
   onSubmit: (otp: string) => void;
 }
 
+const fetchOtpSession = async (otpSessionId: string) => {
+  try {
+    const otpDetail = await fetch(`/api/otpAuth/${otpSessionId}`).then((res) =>
+      res.json()
+    );
+    return otpDetail;
+  } catch (error) {
+    Swal.fire({
+      title: "OTP Fetch Error",
+      icon: "error",
+      text: "could not able to fetch otp details",
+    });
+    return null;
+  }
+};
+
 const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
   const [otp, setOtp] = useState<string>("");
   const [resendDisabled, setResendDisabled] = useState(false);
-  const [otpExpiryTime, setOtpExpiryTime] = useState(5 * 60);
+  const [expiryTime, setExpiryTime] = useState<number>(0);
   const [otpSessionId, setOtpSessionId] = useState<string>("");
-  useEffect(()=>{
-    setOtpSessionId("nbfnfmgh");
-    const storedOtp=sessionStorage.getItem(otpSessionId);
-    if(storedOtp){
-      setOtp(storedOtp);
-    }
-  },[]);
   useEffect(() => {
-    let timer: NodeJS.Timeout | undefined = undefined;
-    if (otpExpiryTime > 0) {
-      timer = setInterval(() => setOtpExpiryTime(otpExpiryTime - 1), 1000);
-    }
-    return () => {
-      if (timer) {
-        clearInterval(timer);
+    const fetchData = async () => {
+      const otpSessionId = sessionStorage.getItem("otpSessionId");
+      if (otpSessionId) {
+        const otpSession = await fetchOtpSession(otpSessionId);
+        if (otpSession) {
+          setOtpSessionId(otpSessionId);
+          setOtp(otpSession.otp.toString());
+          setExpiryTime(new Date(otpSession.expiryAt).getTime());
+        }
       }
     };
-  }, [otpExpiryTime]);
+    fetchData();
+  }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (expiryTime > Date.now()) {
+        setExpiryTime(expiryTime - 1000);
+      } else {
+        setExpiryTime(0);
+        setResendDisabled(false);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [expiryTime]);
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}`;
@@ -44,21 +68,40 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
   const handleChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setOtp(value);
-      if(value===otp){
+      if (value === otp) {
         Swal.fire({
           title: "Email Verification Successful",
           icon: "success",
-          text: "Your email has been successfully verified. You can now log in."
+          text: "Your email has been successfully verified. You can now log in.",
         });
       }
     }
   };
-  const handleResendOTP = () => {
+  const handleResendOTP =async () => {
     setResendDisabled(true);
-    console.log("Resending OTP...");
-    setTimeout(() => {
-      setResendDisabled(false);
-    }, 300000);
+    try {
+      const response = await fetch("/api/otp-sessions/resend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: "user@example.com" }),
+      });
+
+      if (response.ok) {
+        const { otpSessionId } = await response.json();
+        sessionStorage.setItem("otpSessionId", otpSessionId);
+        console.log("OTP resent successfully");
+      } else {
+        console.error("Failed to resend OTP");
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+    } finally {
+      setTimeout(() => {
+        setResendDisabled(false);
+      }, 300000);
+    }
   };
   const handleComplete = (finalValue: string) => {
     fetch("...");
@@ -68,7 +111,7 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
       <Box sx={{ mb: 2 }}>
         <Typography variant="body1" gutterBottom>
           Please check your email for the OTP. It will expire in{" "}
-          <span style={{ color: "red" }}>{formatTime(otpExpiryTime)}</span>{" "}
+          <span style={{ color: "red" }}>{formatTime(expiryTime)}</span>{" "}
           minutes.
         </Typography>
       </Box>
