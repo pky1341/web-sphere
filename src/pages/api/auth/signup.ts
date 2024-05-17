@@ -60,8 +60,8 @@ export default async function handler(
             password: hashedPassword,
           },
         });
-        await sendVerificationRequest(String(Email));
-        res.status(200).json({ message: "User created successfully" });
+        const otpSessionId=await sendVerificationRequest(String(Email));
+        res.status(200).json({ otpSessionId });
       } catch (error) {
         res.status(500).json({ error: "Failed to create user" });
       }

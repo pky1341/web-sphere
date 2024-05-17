@@ -2,37 +2,38 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import Swal from "sweetalert2";
-
-interface OTPProps {
-  onSubmit: (otp: string) => void;
+interface OTPFormProps {
+  onSubmit: () => void;
+  email: string;
+  onClose: () => void;
 }
-
-const fetchOtpSession = async (otpSessionId: string) => {
+const fetchOtpSession = async (otpSessionId: string, email: string) => {
   try {
-    const otpDetail = await fetch(`/api/otpAuth/${otpSessionId}`).then((res) =>
-      res.json()
-    );
+    const otpDetail = await fetch(
+      `/api/otpAuth/${otpSessionId}?email=${email}`
+    ).then((res) => res.json());
     return otpDetail;
   } catch (error) {
     Swal.fire({
       title: "OTP Fetch Error",
       icon: "error",
-      text: "could not able to fetch otp details",
+      text: "Could not fetch OTP details. Please try again.",
     });
     return null;
   }
 };
 
-const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
+const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const [otp, setOtp] = useState<string>("");
   const [resendDisabled, setResendDisabled] = useState(false);
   const [expiryTime, setExpiryTime] = useState<number>(0);
   const [otpSessionId, setOtpSessionId] = useState<string>("");
+
   useEffect(() => {
     const fetchData = async () => {
       const otpSessionId = sessionStorage.getItem("otpSessionId");
       if (otpSessionId) {
-        const otpSession = await fetchOtpSession(otpSessionId);
+        const otpSession = await fetchOtpSession(otpSessionId, email);
         if (otpSession) {
           setOtpSessionId(otpSessionId);
           setOtp(otpSession.otp.toString());
@@ -41,7 +42,8 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
       }
     };
     fetchData();
-  }, []);
+  }, [email]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (expiryTime > Date.now()) {
@@ -54,30 +56,26 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
 
     return () => clearInterval(interval);
   }, [expiryTime]);
+
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60000);
-    const seconds = Math.floor((time % 60000) / 1000);
-    return `${minutes.toString().padStart(2, "0")}:${seconds
+    const hours = Math.floor(time / (1000 * 60 * 60));
+    const minutes = Math.floor((time / (1000 * 60)) % 60);
+    const seconds = Math.floor((time / 1000) % 60);
+    return `${hours.toString().padStart(2, "0")}:${minutes
       .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    onSubmit(otp);
-  };
+
   const handleChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setOtp(value);
-      if (value === otp) {
-        Swal.fire({
-          title: "Email Verification Successful",
-          icon: "success",
-          text: "Your email has been successfully verified. You can now log in.",
-        });
+      if (value.length === 4) {
+        verifyOTP(value);
       }
     }
   };
-  const handleResendOTP =async () => {
+
+  const handleResendOTP = async () => {
     setResendDisabled(true);
     try {
       const response = await fetch("/api/otp-sessions/resend", {
@@ -103,22 +101,71 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
       }, 300000);
     }
   };
-  const handleComplete = (finalValue: string) => {
-    fetch("...");
+
+  const verifyOTP = async (finalValue: string) => {
+    try {
+      const otpSessionId = sessionStorage.getItem("otpSessionId");
+      console.log(`this otp session ${otpSessionId}`);
+      if (otpSessionId) {
+        const otpSession = await fetchOtpSession(otpSessionId, email);
+        if (otpSession) {
+          const { otp, expiryAt } = otpSession;
+          const currentTime = new Date().getTime();
+          const expiryTime = new Date(expiryAt).getTime();
+
+          if (finalValue === otp.toString() && currentTime <= expiryTime) {
+            Swal.fire({
+              title: "OTP Verification Successful",
+              icon: "success",
+              text: "Your OTP has been successfully verified.",
+            });
+          } else if (currentTime > expiryTime) {
+            Swal.fire({
+              title: "OTP Expired",
+              icon: "error",
+              text: "Your OTP has expired. Please request a new one.",
+            });
+          } else {
+            Swal.fire({
+              title: "Invalid OTP",
+              icon: "error",
+              text: "The OTP you entered is invalid. Please try again.",
+            });
+          }
+        } else {
+          Swal.fire({
+            title: "OTP Session Not Found",
+            icon: "error",
+            text: "An error occurred while verifying your OTP. Please try again.",
+          });
+        }
+      } else {
+        Swal.fire({
+          title: "OTP Session Not Found",
+          icon: "error",
+          text: "An error occurred while verifying your OTP. Please try again.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        text: "An error occurred while verifying your OTP. Please try again.",
+      });
+    }
   };
+
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <Box sx={{ mb: 2 }}>
         <Typography variant="body1" gutterBottom>
           Please check your email for the OTP. It will expire in{" "}
-          <span style={{ color: "red" }}>{formatTime(expiryTime)}</span>{" "}
-          minutes.
+          <span style={{ color: "red" }}>{formatTime(expiryTime)}</span>.
         </Typography>
       </Box>
       <MuiOtpInput
         value={otp}
         onChange={handleChange}
-        onComplete={handleComplete}
         length={4}
         autoFocus
         validateChar={(character: string, index: number) =>
@@ -126,22 +173,14 @@ const OtpForm: React.FC<OTPProps> = ({ onSubmit }) => {
         }
       />
       <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        className="mt-2 w-full"
-      >
-        Verify OTP
-      </Button>
-      <Button
         onClick={handleResendOTP}
         disabled={resendDisabled}
         className="mt-2"
       >
         Resend OTP
       </Button>
-    </form>
+    </div>
   );
 };
 
-export { OtpForm };
+export default OtpForm;

@@ -22,7 +22,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
-import {OtpForm} from "./OtpForm";
+import OtpForm from "./OtpForm";
 
 const dataValidation = z
   .object({
@@ -41,10 +41,17 @@ interface signUpFormProps {
   isOpen: boolean;
   onClose: () => void;
 }
+interface OTPProps{
+  onSubmit:()=>void;
+  email:string;
+  onClose:()=>void;
+}
 const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOTPForm, setShowOTPForm] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const {
     register,
     handleSubmit,
@@ -56,6 +63,8 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       reset();
+      setOtpVerified(false);
+      setShowOTPForm(false);
     }
   }, [isOpen, reset]);
 
@@ -70,14 +79,10 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
         body: JSON.stringify(data),
       });
       if (response.ok) {
-        // await signIn("credentials", {
-        //   email: data.Email,
-        //   password: data.Password,
-        //   redirect: false,
-        // });
-        // Swal.fire("Success", "User successfully created", "success");
+        const { otpSessionId } = await response.json();
+        setUserEmail(data.Email);
+        sessionStorage.setItem("otpSessionId", otpSessionId);
         setShowOTPForm(true);
-        // onClose();
       } else {
         const errorData = await response.json();
         Swal.fire({
@@ -95,8 +100,8 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
     }
     setLoading(false);
   };
-  const handleOTPSubmit = (otp: string) => {
-    console.log("OTP submitted:", otp);
+  const handleOTPVerified = () => {
+    setOtpVerified(true);
     onClose();
   };
 
@@ -114,134 +119,142 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
       >
         <Box className="bg-white rounded-lg shadow-lg p-6">
           <Typography variant="h5" className="mb-2">
-            {showOTPForm ? "Verify OTP" : "Sign Up"}
+          {otpVerified ? "Sign Up Successful" : showOTPForm ? "Verify OTP": "Sign Up"}
           </Typography>
-          {showOTPForm ? (
-            <OtpForm onSubmit={handleOTPSubmit} />
-          ) : (
+          {otpVerified ? (
+            <Typography variant="body1">
+            Your account has been created successfully.
+          </Typography>
+          ) :showOTPForm ?(
+            <OtpForm
+            onSubmit={handleOTPVerified}
+            email={userEmail}
+            onClose={onClose}
+          />
+          ): (
             <>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <TextField
-                label="First Name"
-                {...register("FirstName")}
-                error={Boolean(errors.FirstName)}
-                helperText={`${errors.FirstName?.message || ''}`}
-                required
-                className="mb-2"
-                fullWidth
-              />
-              <TextField
-                label="Last Name"
-                {...register("LastName")}
-                error={Boolean(errors.LastName)}
-                helperText={`${errors.FirstName?.message || ''}`}
-                required
-                className="mb-2"
-                fullWidth
-              />
-              <TextField
-                label="Email"
-                type="email"
-                {...register("Email")}
-                error={Boolean(errors.Email)}
-                helperText={`${errors.FirstName?.message || ''}`}
-                required
-                className="mb-2"
-                fullWidth
-              />
-              <TextField
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                {...register("Password")}
-                error={Boolean(errors.Password)}
-                helperText={`${errors.FirstName?.message || ''}`}
-                required
-                className="mb-2"
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleShowPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <TextField
-                label="Confirm Password"
-                type="password"
-                {...register("ConfirmPassword")}
-                error={Boolean(errors.ConfirmPassword)}
-                helperText={`${errors.FirstName?.message || ''}`}
-                required
-                className="mb-2"
-                fullWidth
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className="mt-2 w-full"
-                disabled={loading}
-              >
-                {loading ? <CircularProgress size={24} /> : "Sign Up"}
-              </Button>
-            </form>
-          <Divider className="mb-4 relative">
-            <span className="bg-white px-2 absolute left-1/2 -translate-x-1/2">
-              or
-            </span>
-          </Divider>
-          <Box className="flex justify-around mb-2">
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<GoogleIcon />}
-              // onClick={() => handleSocialSignup("Google")}
-              className="mr-2 rounded-full"
-              style={{ backgroundColor: "#DB4437" }}
-            >
-              Google
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<FacebookIcon />}
-              // onClick={() => handleSocialSignup("Facebook")}
-              className="mr-2 rounded-full"
-              style={{ backgroundColor: "#3B5998" }}
-            >
-              Facebook
-            </Button>
-          </Box>
-          <Box className="flex justify-around mb-2">
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<LinkedInIcon />}
-              // onClick={() => handleSocialSignup("LinkedIn")}
-              className="mr-2 rounded-full"
-              style={{ backgroundColor: "#0A66C2" }}
-            >
-              LinkedIn
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<GitHubIcon />}
-              // onClick={() => handleSocialSignup("GitHub")}
-              className="rounded-full"
-              style={{ backgroundColor: "#24292E" }}
-            >
-              GitHub
-            </Button>
-          </Box>
-          </>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <TextField
+                  label="First Name"
+                  {...register("FirstName")}
+                  error={Boolean(errors.FirstName)}
+                  helperText={`${errors.FirstName?.message || ""}`}
+                  required
+                  className="mb-2"
+                  fullWidth
+                />
+                <TextField
+                  label="Last Name"
+                  {...register("LastName")}
+                  error={Boolean(errors.LastName)}
+                  helperText={`${errors.FirstName?.message || ""}`}
+                  required
+                  className="mb-2"
+                  fullWidth
+                />
+                <TextField
+                  label="Email"
+                  type="email"
+                  {...register("Email")}
+                  error={Boolean(errors.Email)}
+                  helperText={`${errors.FirstName?.message || ""}`}
+                  required
+                  className="mb-2"
+                  fullWidth
+                />
+                <TextField
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  {...register("Password")}
+                  error={Boolean(errors.Password)}
+                  helperText={`${errors.FirstName?.message || ""}`}
+                  required
+                  className="mb-2"
+                  fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  label="Confirm Password"
+                  type="password"
+                  {...register("ConfirmPassword")}
+                  error={Boolean(errors.ConfirmPassword)}
+                  helperText={`${errors.FirstName?.message || ""}`}
+                  required
+                  className="mb-2"
+                  fullWidth
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className="mt-2 w-full"
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : "Sign Up"}
+                </Button>
+              </form>
+              <Divider className="mb-4 relative">
+                <span className="bg-white px-2 absolute left-1/2 -translate-x-1/2">
+                  or
+                </span>
+              </Divider>
+              <Box className="flex justify-around mb-2">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<GoogleIcon />}
+                  // onClick={() => handleSocialSignup("Google")}
+                  className="mr-2 rounded-full"
+                  style={{ backgroundColor: "#DB4437" }}
+                >
+                  Google
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<FacebookIcon />}
+                  // onClick={() => handleSocialSignup("Facebook")}
+                  className="mr-2 rounded-full"
+                  style={{ backgroundColor: "#3B5998" }}
+                >
+                  Facebook
+                </Button>
+              </Box>
+              <Box className="flex justify-around mb-2">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<LinkedInIcon />}
+                  // onClick={() => handleSocialSignup("LinkedIn")}
+                  className="mr-2 rounded-full"
+                  style={{ backgroundColor: "#0A66C2" }}
+                >
+                  LinkedIn
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<GitHubIcon />}
+                  // onClick={() => handleSocialSignup("GitHub")}
+                  className="rounded-full"
+                  style={{ backgroundColor: "#24292E" }}
+                >
+                  GitHub
+                </Button>
+              </Box>
+            </>
           )}
         </Box>
       </Modal>
