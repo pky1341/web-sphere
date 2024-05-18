@@ -26,7 +26,7 @@ const fetchOtpSession = async (otpSessionId: string, email: string) => {
 const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const [otp, setOtp] = useState<string>("");
   const [resendDisabled, setResendDisabled] = useState(false);
-  const [expiryTime, setExpiryTime] = useState<number>(0);
+  const [expiryTime, setExpiryTime] = useState<number>(300000);
   const [otpSessionId, setOtpSessionId] = useState<string>("");
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         if (otpSession) {
           setOtpSessionId(otpSessionId);
           setOtp(otpSession.otp.toString());
-          setExpiryTime(new Date(otpSession.expiryAt).getTime());
+          setExpiryTime(new Date(otpSession.expiryAt).getTime()-Date.now());
         }
       }
     };
@@ -46,7 +46,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (expiryTime > Date.now()) {
+      if (expiryTime > 0) {
         setExpiryTime(expiryTime - 1000);
       } else {
         setExpiryTime(0);
@@ -58,12 +58,11 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   }, [expiryTime]);
 
   const formatTime = (time: number) => {
-    const hours = Math.floor(time / (1000 * 60 * 60));
-    const minutes = Math.floor((time / (1000 * 60)) % 60);
-    const seconds = Math.floor((time / 1000) % 60);
-    return `${hours.toString().padStart(2, "0")}:${minutes
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
+    return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      .padStart(2, "0")}`;
   };
 
   const handleChange = (value: string) => {
@@ -105,21 +104,20 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const verifyOTP = async (finalValue: string) => {
     try {
       const otpSessionId = sessionStorage.getItem("otpSessionId");
-      console.log(`this otp session ${otpSessionId}`);
       if (otpSessionId) {
         const otpSession = await fetchOtpSession(otpSessionId, email);
         if (otpSession) {
           const { otp, expiryAt } = otpSession;
-          const currentTime = new Date().getTime();
-          const expiryTime = new Date(expiryAt).getTime();
+          const currentTime = Date.now();
+          const expiryTimeMs = new Date(expiryAt).getTime();
 
-          if (finalValue === otp.toString() && currentTime <= expiryTime) {
+          if (finalValue === otp.toString() && currentTime <= expiryTimeMs) {
             Swal.fire({
               title: "OTP Verification Successful",
               icon: "success",
               text: "Your OTP has been successfully verified.",
             });
-          } else if (currentTime > expiryTime) {
+          } else if (currentTime > expiryTimeMs) {
             Swal.fire({
               title: "OTP Expired",
               icon: "error",
@@ -172,6 +170,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
           /^\d*$/.test(character)
         }
       />
+      
       <Button
         onClick={handleResendOTP}
         disabled={resendDisabled}

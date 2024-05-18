@@ -1,5 +1,5 @@
 # Use the official Node.js 20 image as the base for the build stage
-FROM node:20-alpine as builder
+FROM node:20-alpine AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -17,17 +17,13 @@ RUN npm config set registry https://registry.npmjs.org/
 RUN npm install -g npm@latest
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Correctly copy the entire project
 COPY ./ ./
 
-
 # Build the Next.js app
 RUN npm run build
-
-# After the npm run build step
-RUN ls -la /app/.next
 
 # Use the official Node.js 20 image as the base for the production stage
 FROM node:20-alpine
@@ -36,20 +32,21 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy the built application from the builder stage
-COPY --from=builder /app/.next ./
+COPY --from=builder /app/.next ./.next
 # Copy any other necessary directories (adjust as needed)
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/static ./static
-COPY --from=builder /app/images ./images
+COPY --from=builder /app/src/images ./images
 
 # Copy package.json and package-lock.json for production dependencies
 COPY --from=builder /app/package*.json ./
 
 # Install production dependencies
-RUN npm install --production
+RUN npm ci --production
 
 # Expose the port the app will run on
 EXPOSE 3000
 
+ENV HOST 0.0.0.0
+
 # Start the app
-CMD ["npm", "start"]
+CMD ["npx", "next", "start"]

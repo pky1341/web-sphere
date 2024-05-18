@@ -1,0 +1,9 @@
+version: '3'
+services:
+  web:
+    image: pradeep663299719/web-sphere:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
