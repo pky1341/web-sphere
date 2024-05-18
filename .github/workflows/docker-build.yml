@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t mydockerhubusername/myapp:latest -f docker/Dockerfile .
-          docker tag mydockerhubusername/myapp:latest mydockerhubusername/myapp:${{ github.sha }}
-          docker push mydockerhubusername/myapp:latest
-          docker push mydockerhubusername/myapp:${{ github.sha }}
+          docker build -t pradeep663299719/web-sphere:latest -f docker/Dockerfile .
+          docker tag pradeep663299719/web-sphere:latest pradeep663299719/web-sphere:${{ github.sha }}
+          docker push pradeep663299719/web-sphere:latest
+          docker push pradeep663299719/web-sphere:${{ github.sha }}
