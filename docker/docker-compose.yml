@@ -1,4 +1,5 @@
-version: '3'
+version: "3.8"
+
 services:
   web:
     image: pradeep663299719/web-sphere:latest
@@ -7,3 +8,32 @@ services:
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
+      - DATABASE_URL=postgresql://pradiep:pradiep@db:5432/next_db?schema=public
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=next_db
+      - POSTGRES_USER=pradiep
+      - POSTGRES_PASSWORD=pradiep
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
