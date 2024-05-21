@@ -18,7 +18,6 @@ const emailTransport = nodemailer.createTransport({
 export const sendVerificationRequest = async (email: string) => {
   let otp = Number(generateNumericOTP(4));
   const expiryAt=new Date(Date.now()+5*60*1000);
-  
   const otpSession=await prisma.otpDetails.create({
     data:{
       email,

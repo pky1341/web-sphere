@@ -25,9 +25,10 @@ const fetchOtpSession = async (otpSessionId: string, email: string) => {
 
 const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const [otp, setOtp] = useState<string>("");
-  const [resendDisabled, setResendDisabled] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState<boolean>(false);
   const [expiryTime, setExpiryTime] = useState<number>(300000);
   const [otpSessionId, setOtpSessionId] = useState<string>("");
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +38,8 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         if (otpSession) {
           setOtpSessionId(otpSessionId);
           setOtp(otpSession.otp.toString());
-          setExpiryTime(new Date(otpSession.expiryAt).getTime()-Date.now());
+          setExpiryTime(new Date(otpSession.expiryAt).getTime() - Date.now());
+          setResendDisabled(false);
         }
       }
     };
@@ -50,13 +52,20 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         setExpiryTime(expiryTime - 1000);
       } else {
         setExpiryTime(0);
-        setResendDisabled(false);
+        setTimeout(() => {
+          setResendDisabled(false);
+        }, 300000);
       }
     }, 1000);
 
     return () => clearInterval(interval);
   }, [expiryTime]);
 
+  useEffect(() => {
+    if (otp.length === 4) {
+      verifyOTP(otp);
+    }
+  }, [otp]);
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
@@ -68,9 +77,9 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const handleChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setOtp(value);
-      if (value.length === 4) {
-        verifyOTP(value);
-      }
+      // if (value.length === 4) {
+      //   verifyOTP(value);
+      // }
     }
   };
 
@@ -88,12 +97,24 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
       if (response.ok) {
         const { otpSessionId } = await response.json();
         sessionStorage.setItem("otpSessionId", otpSessionId);
-        console.log("OTP resent successfully");
+        const otpSession = await fetchOtpSession(otpSessionId, email);
+        if (otpSession) {
+          setOtpSessionId(otpSessionId);
+          setOtp(otpSession.otp.toString());
+          setExpiryTime(new Date(otpSession.expiryAt).getTime() - Date.now());
+          console.log("OTP resent successfully");
+        }
       } else {
         console.error("Failed to resend OTP");
+        // setTimeout(() => {
+        //   setResendDisabled(false);
+        // }, 300000);
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
+      // setTimeout(() => {
+      //   setResendDisabled(false);
+      // }, 300000);
     } finally {
       setTimeout(() => {
         setResendDisabled(false);
@@ -102,8 +123,10 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   };
 
   const verifyOTP = async (finalValue: string) => {
+    setIsVerifying(true);
     try {
       const otpSessionId = sessionStorage.getItem("otpSessionId");
+
       if (otpSessionId) {
         const otpSession = await fetchOtpSession(otpSessionId, email);
         if (otpSession) {
@@ -117,18 +140,21 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
               icon: "success",
               text: "Your OTP has been successfully verified.",
             });
+            setIsVerifying(false);
           } else if (currentTime > expiryTimeMs) {
             Swal.fire({
               title: "OTP Expired",
               icon: "error",
               text: "Your OTP has expired. Please request a new one.",
             });
+            setIsVerifying(false);
           } else {
             Swal.fire({
               title: "Invalid OTP",
               icon: "error",
               text: "The OTP you entered is invalid. Please try again.",
             });
+            setIsVerifying(false);
           }
         } else {
           Swal.fire({
@@ -136,6 +162,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
             icon: "error",
             text: "An error occurred while verifying your OTP. Please try again.",
           });
+          setIsVerifying(false);
         }
       } else {
         Swal.fire({
@@ -143,6 +170,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
           icon: "error",
           text: "An error occurred while verifying your OTP. Please try again.",
         });
+        setIsVerifying(false);
       }
     } catch (error) {
       Swal.fire({
@@ -150,6 +178,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         icon: "error",
         text: "An error occurred while verifying your OTP. Please try again.",
       });
+      setIsVerifying(false);
     }
   };
 
@@ -170,7 +199,14 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
           /^\d*$/.test(character)
         }
       />
-      
+      <Button
+        onClick={() => verifyOTP(otp)}
+        disabled={isVerifying || !otp.match(/^\d{4}$/)}
+        variant="contained"
+        className="mt-2 w-full"
+      >
+        {isVerifying ? "Verifying..." : "Verify"}
+      </Button>
       <Button
         onClick={handleResendOTP}
         disabled={resendDisabled}
