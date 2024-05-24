@@ -90,14 +90,14 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const handleResendOTP = async () => {
     setResendDisabled(true);
     try {
-      const response = await fetch("/api/otp-sessions/resend", {
+      const response = await fetch("/api/otpAuth/resend", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: "user@example.com" }),
+        body: JSON.stringify({ email: email }),
       });
-
+      // console.log(response);
       if (response.ok) {
         const { otpSessionId } = await response.json();
         sessionStorage.setItem("otpSessionId", otpSessionId);
