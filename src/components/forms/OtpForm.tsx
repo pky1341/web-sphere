@@ -38,8 +38,10 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         if (otpSession) {
           setOtpSessionId(otpSessionId);
           setOtp(otpSession.otp.toString());
-          setExpiryTime(new Date(otpSession.expiryAt).getTime() - Date.now());
-          setResendDisabled(false);
+          const expiryTimeMs = new Date(otpSession.expiryAt).getTime();
+          const currentTime = Date.now();
+          setExpiryTime(expiryTimeMs - currentTime);
+          setResendDisabled(currentTime > expiryTimeMs);
         }
       }
     };
@@ -47,14 +49,16 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   }, [email]);
 
   useEffect(() => {
+    setResendDisabled(false);
     const interval = setInterval(() => {
       if (expiryTime > 0) {
         setExpiryTime(expiryTime - 1000);
       } else {
         setExpiryTime(0);
-        setTimeout(() => {
-          setResendDisabled(false);
-        }, 300000);
+        setResendDisabled(true);
+        // setTimeout(() => {
+        //   setResendDisabled(true);
+        // }, 300000);
       }
     }, 1000);
 
@@ -101,7 +105,10 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         if (otpSession) {
           setOtpSessionId(otpSessionId);
           setOtp(otpSession.otp.toString());
-          setExpiryTime(new Date(otpSession.expiryAt).getTime() - Date.now());
+          const expiryTimeMs = new Date(otpSession.expiryAt).getTime();
+          const currentTime = Date.now();
+          setExpiryTime(expiryTimeMs - currentTime);
+          setResendDisabled(false);
           console.log("OTP resent successfully");
         }
       } else {
@@ -209,7 +216,7 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
       </Button>
       <Button
         onClick={handleResendOTP}
-        disabled={resendDisabled}
+        disabled={!resendDisabled}
         className="mt-2"
       >
         Resend OTP
