@@ -17,14 +17,27 @@ const emailTransport = nodemailer.createTransport({
 
 export const sendVerificationRequest = async (email: string) => {
   let otp = Number(generateNumericOTP(4));
-  const expiryAt=new Date(Date.now()+5*60*1000);
-  const otpSession=await prisma.otpDetails.create({
-    data:{
-      email,
-      otp,
-      expiryAt
-    }
-  });
+  const expiryAt=new Date(Date.now()+5*60*1000); 
+  let otpSession=await prisma.otpDetails.findUnique({where:{email}});
+  if (otpSession) {
+    otpSession=await prisma.otpDetails.update({
+      where:{
+        id:otpSession.id
+      },
+      data:{
+        otp,
+        expiryAt
+      }
+    });
+  } else {
+    otpSession=await prisma.otpDetails.create({
+      data:{
+        email,
+        otp,
+        expiryAt
+      }
+    });
+  }
 
   await emailTransport.sendMail({
     from: process.env.EMAIL_FROM,

@@ -56,9 +56,6 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
       } else {
         setExpiryTime(0);
         setResendDisabled(true);
-        // setTimeout(() => {
-        //   setResendDisabled(true);
-        // }, 300000);
       }
     }, 1000);
 
@@ -81,9 +78,6 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
   const handleChange = (value: string) => {
     if (/^\d*$/.test(value)) {
       setOtp(value);
-      // if (value.length === 4) {
-      //   verifyOTP(value);
-      // }
     }
   };
 
@@ -95,9 +89,8 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({ email }),
       });
-      // console.log(response);
       if (response.ok) {
         const { otpSessionId } = await response.json();
         sessionStorage.setItem("otpSessionId", otpSessionId);
@@ -113,15 +106,9 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
         }
       } else {
         console.error("Failed to resend OTP");
-        // setTimeout(() => {
-        //   setResendDisabled(false);
-        // }, 300000);
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      // setTimeout(() => {
-      //   setResendDisabled(false);
-      // }, 300000);
     } finally {
       setTimeout(() => {
         setResendDisabled(false);

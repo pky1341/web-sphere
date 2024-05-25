@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "target": "ES2015",
     "plugins": [
       {
         "name": "next"
@@ -22,7 +23,8 @@
       "@/*": ["src/*"],
       "@/pages/*": ["src/pages/*"],
       "@/components/*": ["src/components/*"],
-      "@/images/*": ["src/images/*"]
+      "@/images/*": ["src/images/*"],
+      "@/utils/*": ["src/utils/*"]
     }
   },
   "include": [
