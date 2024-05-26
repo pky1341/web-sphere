@@ -5,22 +5,25 @@ import "./globals.css";
 import { Header } from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import Container from "@mui/material/Container";
+import MyApp from "@/pages/_app";
+import { ClientSessionProvider } from "@/components/ClientSessionProvider";
+
 
 const inter = Inter({ subsets: ["latin"] });
-interface layoutProps {
+interface LayoutProps {
   children: ReactNode;
-  session: any;
 }
 
-
-function RootLayout({ children, session }: layoutProps) {
+function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>
         <Container maxWidth="xl" className="px-0">
-          <Header session={session} />
-          {children}
-          <Footer />
+        <ClientSessionProvider>
+            <MyApp Component={Header} pageProps={{session:undefined}} />
+            {children}
+          </ClientSessionProvider>
+          <Footer/>
         </Container>
       </body>
     </html>

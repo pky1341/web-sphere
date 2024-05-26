@@ -3,7 +3,6 @@ import EmailProvider, { SendVerificationRequestParams } from "next-auth/provider
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-import nodemailer from "nodemailer";
 import { sendVerificationRequest } from '@/utils/emailReq';
 
 
@@ -20,11 +19,13 @@ const options: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
+        otp:{label:"OTP",type:"tesxt"}
       },
       async authorize(credentials, req) {
-        const { email, password } = credentials as {
+        const { email, password,otp } = credentials as {
           email: string;
           password: string;
+          otp:string;
         };
 
         const user = await prisma.user.findUnique({
@@ -32,6 +33,16 @@ const options: NextAuthOptions = {
         });
 
         if (!user || user.password !== password) {
+          return null;
+        }
+        const otpSession=await prisma.otpDetails.findFirst({
+          where:{
+            email,
+            otp:Number(otp),
+            expiryAt:{gt:new Date()}
+          },
+        });
+        if (!otpSession) {
           return null;
         }
         return { ...user, id: user.id.toString() };
@@ -44,6 +55,7 @@ const options: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {

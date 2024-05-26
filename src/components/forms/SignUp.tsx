@@ -40,17 +40,17 @@ const dataValidation = z
 interface signUpFormProps {
   isOpen: boolean;
   onClose: () => void;
+  session:any;
 }
 interface OTPProps{
   onSubmit:()=>void;
   email:string;
   onClose:()=>void;
 }
-const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
+const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose,session }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOTPForm, setShowOTPForm] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const {
     register,
@@ -63,7 +63,6 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       reset();
-      setOtpVerified(false);
       setShowOTPForm(false);
     }
   }, [isOpen, reset]);
@@ -100,9 +99,28 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
     }
     setLoading(false);
   };
-  const handleOTPVerified = () => {
-    setOtpVerified(true);
-    onClose();
+  const handleOTPVerified =async () => {
+    try {
+      const response= await signIn('credentials',{
+        email:userEmail,
+        redirect:false
+      });
+      if (response?.ok) {
+        onClose();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: "Failed to create session. Please try again.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `An error occurred: ${error}`,
+      });
+    }
   };
 
   const handleShowPassword = () => {
@@ -119,13 +137,9 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose }) => {
       >
         <Box className="bg-white rounded-lg shadow-lg p-6">
           <Typography variant="h5" className="mb-2">
-          {otpVerified ? "Sign Up Successful" : showOTPForm ? "Verify OTP": "Sign Up"}
+          {showOTPForm ? "Verify OTP": "Sign Up"}
           </Typography>
-          {otpVerified ? (
-            <Typography variant="body1">
-            Your account has been created successfully.
-          </Typography>
-          ) :showOTPForm ?(
+          {showOTPForm ?(
             <OtpForm
             onSubmit={handleOTPVerified}
             email={userEmail}

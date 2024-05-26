@@ -14,14 +14,14 @@ import SignUp from "@/components/forms/SignUp";
 import ListItemText from "@mui/material/ListItemText";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Logout, Settings } from "@mui/icons-material";
-import {withSession} from '@/utils/withSession';
-export const getServerSideProps = withSession;
+// import {withSession} from '@/utils/withSession';
+import { useSession, signOut } from "next-auth/react";
+// export const getServerSideProps = withSession;
 
-interface HeaderProps{
-  session:any
-}
-const Header:React.FC<HeaderProps>  = ({session }) => {
+const Header: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
+  const { data: session } = useSession();
   const openForm = () => {
     setOpenSignUpModal(true);
   };
@@ -35,9 +35,7 @@ const Header:React.FC<HeaderProps>  = ({session }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const [menuOpen, setMenuOpen] = useState(false);
-  // const {props:session}=withSession();
-  // const { sessi } = props;
+
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
@@ -124,7 +122,16 @@ const Header:React.FC<HeaderProps>  = ({session }) => {
               onClick={handleMenu}
               color="inherit"
             >
-              <AccountCircle />
+              {session.user?.image ? (
+                <Image
+                  src={session.user.image}
+                  alt="Profile"
+                  width={40}
+                  height={40}
+                />
+              ) : (
+                <AccountCircle />
+              )}
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -169,7 +176,11 @@ const Header:React.FC<HeaderProps>  = ({session }) => {
             <Button color="primary" variant="contained" onClick={openForm}>
               Sign Up
             </Button>
-            <SignUp isOpen={openSignUpModal} onClose={closeForm} />
+            <SignUp 
+            isOpen={openSignUpModal} 
+            onClose={closeForm}
+            session={session}
+            />
           </>
         )}
       </div>
