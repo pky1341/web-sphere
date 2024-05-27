@@ -1,10 +1,9 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
-import EmailProvider, { SendVerificationRequestParams } from "next-auth/providers/email";
+import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-import { sendVerificationRequest } from '@/utils/emailReq';
-
+import bcrypt from 'bcrypt';
 
 
 const options: NextAuthOptions = {
@@ -19,31 +18,26 @@ const options: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        otp:{label:"OTP",type:"tesxt"}
       },
       async authorize(credentials, req) {
-        const { email, password,otp } = credentials as {
+        const { email, password } = credentials as {
           email: string;
           password: string;
-          otp:string;
         };
+        if (!email) {
+          throw new Error("Email is required");
+        }
 
         const user = await prisma.user.findUnique({
           where: { email },
         });
-
-        if (!user || user.password !== password) {
-          return null;
+        
+        if (!user) {
+          throw new Error("Invalid email or password");
         }
-        const otpSession=await prisma.otpDetails.findFirst({
-          where:{
-            email,
-            otp:Number(otp),
-            expiryAt:{gt:new Date()}
-          },
-        });
-        if (!otpSession) {
-          return null;
+        const isValidPassword = await bcrypt.compare(password,user.password );
+        if (!isValidPassword) {
+          throw new Error("Invalid email or password"); 
         }
         return { ...user, id: user.id.toString() };
       },

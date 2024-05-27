@@ -15,7 +15,6 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { CheckBox } from "@mui/icons-material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -40,18 +39,14 @@ const dataValidation = z
 interface signUpFormProps {
   isOpen: boolean;
   onClose: () => void;
-  session:any;
+  session: any;
 }
-interface OTPProps{
-  onSubmit:()=>void;
-  email:string;
-  onClose:()=>void;
-}
-const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose,session }) => {
+const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOTPForm, setShowOTPForm] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [userPassword, setUserPassword] = useState("");
   const {
     register,
     handleSubmit,
@@ -80,6 +75,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose,session }) => {
       if (response.ok) {
         const { otpSessionId } = await response.json();
         setUserEmail(data.Email);
+        setUserPassword(data.Password);
         sessionStorage.setItem("otpSessionId", otpSessionId);
         setShowOTPForm(true);
       } else {
@@ -99,14 +95,16 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose,session }) => {
     }
     setLoading(false);
   };
-  const handleOTPVerified =async () => {
+  const handleOTPVerified = async () => {
     try {
-      const response= await signIn('credentials',{
-        email:userEmail,
-        redirect:false
+      const response = await signIn("credentials", {
+        email: userEmail,
+        password: userPassword,
+        redirect: false,
       });
       if (response?.ok) {
         onClose();
+        window.location.reload();
       } else {
         Swal.fire({
           icon: "error",
@@ -137,15 +135,15 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose,session }) => {
       >
         <Box className="bg-white rounded-lg shadow-lg p-6">
           <Typography variant="h5" className="mb-2">
-          {showOTPForm ? "Verify OTP": "Sign Up"}
+            {showOTPForm ? "Verify OTP" : "Sign Up"}
           </Typography>
-          {showOTPForm ?(
+          {showOTPForm ? (
             <OtpForm
-            onSubmit={handleOTPVerified}
-            email={userEmail}
-            onClose={onClose}
-          />
-          ): (
+              onSubmit={handleOTPVerified}
+              email={userEmail}
+              onClose={onClose}
+            />
+          ) : (
             <>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <TextField

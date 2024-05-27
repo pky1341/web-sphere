@@ -14,13 +14,12 @@ import SignUp from "@/components/forms/SignUp";
 import ListItemText from "@mui/material/ListItemText";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Logout, Settings } from "@mui/icons-material";
-// import {withSession} from '@/utils/withSession';
 import { useSession, signOut } from "next-auth/react";
-// export const getServerSideProps = withSession;
+import Login from '@/components/forms/Login';
 
 const Header: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
+  const [openLogin,setOpenLogin]=useState<boolean>(false);
   const { data: session } = useSession();
   const openForm = () => {
     setOpenSignUpModal(true);
@@ -28,6 +27,9 @@ const Header: React.FC = () => {
   const closeForm = () => {
     setOpenSignUpModal(false);
   };
+  const openLoginForm= ()=>{
+    setOpenLogin(true);
+  }
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -35,7 +37,9 @@ const Header: React.FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  const handleLogout=async ()=>{
+    await signOut();
+  }
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
@@ -160,7 +164,7 @@ const Header: React.FC = () => {
                 </ListItemIcon>
                 <ListItemText primary="Settings" />
               </MenuItem>
-              <MenuItem onClick={handleClose}>
+              <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
@@ -170,9 +174,10 @@ const Header: React.FC = () => {
           </div>
         ) : (
           <>
-            <Button color="primary" variant="outlined" disableRipple>
+            <Button color="primary" variant="outlined" onClick={openLoginForm} disableRipple>
               Login
             </Button>
+            <Login isOpen={openLogin} onClose={closeForm} />
             <Button color="primary" variant="contained" onClick={openForm}>
               Sign Up
             </Button>

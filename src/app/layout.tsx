@@ -8,7 +8,6 @@ import Container from "@mui/material/Container";
 import MyApp from "@/pages/_app";
 import { ClientSessionProvider } from "@/components/ClientSessionProvider";
 
-
 const inter = Inter({ subsets: ["latin"] });
 interface LayoutProps {
   children: ReactNode;
@@ -19,11 +18,11 @@ function RootLayout({ children }: LayoutProps) {
     <html lang="en">
       <body className={inter.className}>
         <Container maxWidth="xl" className="px-0">
-        <ClientSessionProvider>
-            <MyApp Component={Header} pageProps={{session:undefined}} />
+          <ClientSessionProvider>
+            <MyApp Component={Header} pageProps={{ session: undefined }} />
             {children}
           </ClientSessionProvider>
-          <Footer/>
+          <Footer />
         </Container>
       </body>
     </html>

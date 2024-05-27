@@ -39,4 +39,8 @@ body {
 .modal-overlay {
   @apply fixed inset-0 bg-gray-900 bg-opacity-50;
 }
+.custom-swal {
+  background-color: rgba(255, 255, 255, 0.95) !important; 
+  z-index: 1050 !important;
+}
  

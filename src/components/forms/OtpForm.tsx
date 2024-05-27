@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import Swal from "sweetalert2";
-import { signIn } from "next-auth/react";
 interface OTPFormProps {
   onSubmit: () => void;
   email: string;
@@ -136,28 +135,8 @@ const OtpForm: React.FC<OTPFormProps> = ({ onSubmit, email, onClose }) => {
               text: "Your OTP has been successfully verified.",
             });
             setIsVerifying(false);
-            try {
-              const response= await signIn('credentials',{
-                email:email,
-                redirect:false
-              });
-              if (response?.ok) {
-                onSubmit();
-                onClose();
-              } else {
-                Swal.fire({
-                  icon: "error",
-                  title: "Failed",
-                  text: "Failed to create session. Please try again.",
-                });
-              }
-            } catch (error) {
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: `An error occurred: ${error}`,
-              });
-            }
+            onSubmit();
+            onClose();
           } else if (currentTime > expiryTimeMs) {
             Swal.fire({
               title: "OTP Expired",
