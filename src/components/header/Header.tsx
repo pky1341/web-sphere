@@ -30,6 +30,9 @@ const Header: React.FC = () => {
   const openLoginForm= ()=>{
     setOpenLogin(true);
   }
+  const closeLogin=()=>{
+    setOpenLogin(false);
+  }
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -177,7 +180,7 @@ const Header: React.FC = () => {
             <Button color="primary" variant="outlined" onClick={openLoginForm} disableRipple>
               Login
             </Button>
-            <Login isOpen={openLogin} onClose={closeForm} />
+            <Login isOpen={openLogin} onClose={closeLogin} />
             <Button color="primary" variant="contained" onClick={openForm}>
               Sign Up
             </Button>
