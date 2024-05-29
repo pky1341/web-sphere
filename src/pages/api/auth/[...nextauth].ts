@@ -4,11 +4,19 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 import bcrypt from 'bcrypt';
+import GoogleProvider from "next-auth/providers/google";
 
 
 const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID||'',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET||'',
+      authorization: 'https://accounts.google.com/o/oauth2/v2/auth',
+      // tokenUrl: 'https://oauth2.googleapis.com/token',
+      profileUrl: 'https://openidconnect.googleapis.com/v1/userinfo',
+    }),
     EmailProvider({
       server: process.env.EMAIL_SERVER_HOST,
       from: process.env.EMAIL_FROM,
