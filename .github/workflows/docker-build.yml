@@ -25,3 +25,16 @@ jobs:
           docker tag pradeep663299719/web-sphere:latest pradeep663299719/web-sphere:${{ github.sha }}
           docker push pradeep663299719/web-sphere:latest
           docker push pradeep663299719/web-sphere:${{ github.sha }}
+
+
+      - name: Update Docker Compose file
+        run: |
+          sed "s|pradeep663299719/web-sphere:.*|pradeep663299719/web-sphere:${{ github.sha }}|" docker/docker-compose.yml
+          echo "::set-output name=docker-compose-content::$(cat docker/docker-compose.yml)"
+        id: update-docker-compose
+
+
+      - name: Print updated Docker Compose file
+        run: |
+          echo "Copy and paste the following content into your local docker/docker-compose.yml file:"
+          echo "${{ steps.update-docker-compose.outputs.docker-compose-content }}"
