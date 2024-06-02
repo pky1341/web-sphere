@@ -14,13 +14,15 @@ datasource db {
 }
 
 model User {
-    id           Int       @id @default(autoincrement())
-    firstName    String
-    lastName     String
-    email        String    @unique
-    password     String
-    createdAt    DateTime  @default(now())
-    updatedAt    DateTime  @updatedAt
+    id             Int       @id @default(autoincrement())
+    firstName      String
+    lastName       String
+    email          String    @unique
+    password       String
+    emailVerified  Boolean   @default(false)
+    isActive       Boolean   @default(true)
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
 
     @@map("users")
 }

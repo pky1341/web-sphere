@@ -22,7 +22,7 @@ import IconButton from "@mui/material/IconButton";
 import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 import OtpForm from "./OtpForm";
-
+import { useAuth0 } from '@auth0/auth0-react';
 const dataValidation = z
   .object({
     FirstName: z.string().min(1, "First Name is Required"),
@@ -47,6 +47,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const [showOTPForm, setShowOTPForm] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
+  const { loginWithRedirect } = useAuth0();
   const {
     register,
     handleSubmit,
@@ -124,6 +125,17 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const handleShowPassword = () => {
     setShowPassword((show) => !show);
   };
+  const handleSocialSignup=async (provider:string)=>{
+    // try {
+      await signIn(provider)
+    // } catch (error) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error",
+    //     text: `An error occurred: ${error}`,
+    //   });
+    // }
+  }
   return (
     <>
       <Modal
@@ -227,7 +239,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<GoogleIcon />}
-                  // onClick={() => handleSocialSignup("Google")}
+                  onClick={loginWithRedirect}
                   className="mr-2 rounded-full"
                   style={{ backgroundColor: "#DB4437" }}
                 >
@@ -237,7 +249,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<FacebookIcon />}
-                  // onClick={() => handleSocialSignup("Facebook")}
+                  onClick={() => handleSocialSignup("Facebook")}
                   className="mr-2 rounded-full"
                   style={{ backgroundColor: "#3B5998" }}
                 >
@@ -249,7 +261,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<LinkedInIcon />}
-                  // onClick={() => handleSocialSignup("LinkedIn")}
+                  onClick={() => handleSocialSignup("LinkedIn")}
                   className="mr-2 rounded-full"
                   style={{ backgroundColor: "#0A66C2" }}
                 >
@@ -259,7 +271,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<GitHubIcon />}
-                  // onClick={() => handleSocialSignup("GitHub")}
+                  onClick={() => handleSocialSignup("GitHub")}
                   className="rounded-full"
                   style={{ backgroundColor: "#24292E" }}
                 >

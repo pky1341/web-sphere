@@ -1,15 +1,34 @@
-// import prisma from "@/lib/prisma";
-// import NextAuth from "next-auth";
+import prisma from "@/lib/prisma";
+import { NextApiRequest, NextApiResponse } from "next";
+import NextAuth from "next-auth";
 
-// export default NextAuth({
-//     callbacks:{
-//         async jwt(token,user,account,profile,isNewuser){
-//             if (isNewuser) {
-//                 const user=await prisma.user.create({
-//                     name:
-//                 });
-//             }
-//             return token
-//         }
-//     }
-// });
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const session = await NextAuth({
+    providers: [],
+    callbacks: {
+      async signIn({user, account, profile}:{user:any,account:any,profile:any}) {
+        if (account?.provider === "google" && profile?.email) {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: profile.email },
+          });
+
+          if (!existingUser) {
+            await prisma.user.create({
+              data: {
+                firstName: profile.name,
+                email: profile.email,
+                emailVerified: true,
+                isActive: true,
+              },
+            });
+          }
+        }
+        return true;
+      },
+    },
+  })(req, res);
+  // res.redirect("/");
+}
