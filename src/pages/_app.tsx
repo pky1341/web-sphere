@@ -1,6 +1,10 @@
 
+"use client";
 import { ClientSessionProvider } from "@/components/ClientSessionProvider";
 import { Auth0Provider } from '@auth0/auth0-react';
+// import { UserProvider } from '@auth0/nextjs-auth0'
+import { auth0Config } from "@/auth/auth0";
+import React from 'react';
 import { createContext } from 'react';
 interface Session {
   user: {
@@ -21,11 +25,7 @@ interface AppProps {
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <Auth0Provider
-      domain={process.env.AUTH0_DOMAIN}
-      clientId={process.env.AUTH0_CLIENT_ID}
-      redirectUri={process.env.AUTH0_REDIRECT_URI}
-    >
+    <Auth0Provider {...auth0Config} domain={auth0Config.domain || ""} clientId={auth0Config.clientId || ""}>
     <ClientSessionProvider>
       <Component {...pageProps} />
     </ClientSessionProvider>

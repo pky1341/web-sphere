@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import React from 'react';
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import { Inter } from "next/font/google";
@@ -8,31 +9,26 @@ import Footer from "@/components/footer/Footer";
 import Container from "@mui/material/Container";
 import MyApp from "@/pages/_app";
 import { ClientSessionProvider } from "@/components/ClientSessionProvider";
-import { Auth0Provider } from '@auth0/auth0-react';
 const inter = Inter({ subsets: ["latin"] });
 interface LayoutProps {
   children: ReactNode;
 }
 
 function RootLayout({ children }: LayoutProps) {
+  
+
   return (
-    <Auth0Provider
-      domain={process.env.AUTH0_DOMAIN}
-      clientId={process.env.AUTH0_CLIENT_ID}
-      redirectUri={process.env.AUTH0_REDIRECT_URI}
-    >
-    <html lang="en">
-      <body className={inter.className}>
-        <Container maxWidth="xl" className="px-0">
-          <ClientSessionProvider>
-            <MyApp Component={Header} pageProps={{ session: undefined }} />
-            {children}
-          </ClientSessionProvider>
-          <Footer />
-        </Container>
-      </body>
-    </html>
-    </Auth0Provider>
+      <html lang="en">
+        <body className={inter.className}>
+          <Container maxWidth="xl" className="px-0">
+            <ClientSessionProvider>
+              <MyApp Component={Header} pageProps={{ session: undefined }} />
+              {children}
+            </ClientSessionProvider>
+            <Footer />
+          </Container>
+        </body>
+      </html>
   );
 }
 

@@ -9,7 +9,7 @@ export default async function handler(
   const session = await NextAuth({
     providers: [],
     callbacks: {
-      async signIn({user, account, profile}:{user:any,account:any,profile:any}) {
+      async signIn({ account, profile}:{user:any,account:any,profile:any}) {
         if (account?.provider === "google" && profile?.email) {
           const existingUser = await prisma.user.findUnique({
             where: { email: profile.email },
