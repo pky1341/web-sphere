@@ -2,7 +2,7 @@
 import { ClientSessionProvider } from "@/components/ClientSessionProvider";
 // import { Auth0Provider } from '@auth0/auth0-react';
 // import { UserProvider } from '@auth0/nextjs-auth0'
-import Auth0ProviderWrapper from "./auth0-provider";
+import Auth0ProviderWrapper from "@/auth/auth0-provider";
 import { auth0Config } from "@/auth/auth0";
 import React from "react";
 import { createContext } from "react";
@@ -26,9 +26,9 @@ interface AppProps {
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Auth0ProviderWrapper>
-      {/* <ClientSessionProvider> */}
-        <Component {...pageProps} />
-      {/* </ClientSessionProvider> */}
+      <ClientSessionProvider>
+      <Component {...pageProps} />
+      </ClientSessionProvider>
     </Auth0ProviderWrapper>
   );
 }
