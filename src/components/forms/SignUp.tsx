@@ -23,7 +23,7 @@ import IconButton from "@mui/material/IconButton";
 import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 import OtpForm from "./OtpForm";
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth0 } from "@auth0/auth0-react";
 const dataValidation = z
   .object({
     FirstName: z.string().min(1, "First Name is Required"),
@@ -49,6 +49,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const { loginWithRedirect } = useAuth0();
+
   const {
     register,
     handleSubmit,
@@ -99,19 +100,36 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   };
   const handleOTPVerified = async () => {
     try {
-      const response = await signIn("credentials", {
-        email: userEmail,
-        password: userPassword,
-        redirect: false,
+      const res = await fetch("/api/auth/verifyEmail", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userEmail,
+        }),
       });
-      if (response?.ok) {
-        onClose();
-        window.location.reload();
+      if (res.ok) {
+        const response = await signIn("credentials", {
+          email: userEmail,
+          password: userPassword,
+          redirect: false,
+        });
+        if (response?.ok) {
+          onClose();
+          window.location.reload();
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: "Failed to create session. Please try again.",
+          });
+        }
       } else {
         Swal.fire({
           icon: "error",
-          title: "Failed",
-          text: "Failed to create session. Please try again.",
+          title: "Email Not Verified",
+          text: "Your email is not verified. Please verify your email to proceed.",
         });
       }
     } catch (error) {
@@ -126,17 +144,11 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const handleShowPassword = () => {
     setShowPassword((show) => !show);
   };
-  const handleSocialSignup=async (provider:string)=>{
-    // try {
-      await signIn(provider)
-    // } catch (error) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Error",
-    //     text: `An error occurred: ${error}`,
-    //   });
-    // }
-  }
+  const handleGoogleLogin = () => {
+    loginWithRedirect({
+      connection: "google-oauth2",
+    });
+  };
   return (
     <>
       <Modal
@@ -240,12 +252,13 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<GoogleIcon />}
-                  onClick={loginWithRedirect}
                   className="mr-2 rounded-full"
                   style={{ backgroundColor: "#DB4437" }}
+                  onClick={handleGoogleLogin}
                 >
                   Google
                 </Button>
+
                 <Button
                   variant="contained"
                   color="primary"

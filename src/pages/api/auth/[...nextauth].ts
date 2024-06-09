@@ -43,6 +43,9 @@ const options: NextAuthOptions = {
         if (!user) {
           throw new Error("Invalid email or password");
         }
+        if (!user.emailVerified) {
+          throw new Error("Email not Verified");
+        }
         const isValidPassword = await bcrypt.compare(password,user.password );
         if (!isValidPassword) {
           throw new Error("Invalid email or password"); 

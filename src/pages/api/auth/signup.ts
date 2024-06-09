@@ -58,6 +58,8 @@ export default async function handler(
             lastName: String(LastName),
             email: String(Email),
             password: hashedPassword,
+            emailVerified:false,
+            isActive:true,
           },
         });
         const otpSessionId=await sendVerificationRequest(String(Email));
