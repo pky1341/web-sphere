@@ -48,7 +48,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const [showOTPForm, setShowOTPForm] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect,auth0Client } = useAuth0();
 
   const {
     register,
@@ -144,9 +144,20 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const handleShowPassword = () => {
     setShowPassword((show) => !show);
   };
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
+    await auth0Client.authorize({
+      audience: "https://web-sphere.auth0.com/api/v2/",
+      scope: "openid profile email",
+      response_type: "code",
+      redirect_uri: "http://localhost:3000",
+    });
+    // loginWithRedirect({
+    //   connection: "google-oauth2",
+    // });
+  };
+  const handleSocialSignup = (provider: string) => {
     loginWithRedirect({
-      connection: "google-oauth2",
+      connection: provider,
     });
   };
   return (
