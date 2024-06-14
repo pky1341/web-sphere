@@ -9,17 +9,18 @@ import {
   TextField,
 } from "@mui/material";
 import Image from "next/image";
-import logo from "@/images/logo/3d.png";
+import logo from "@/images/logo/webLogo.png";
 import SignUp from "@/components/forms/SignUp";
 import ListItemText from "@mui/material/ListItemText";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Logout, Settings } from "@mui/icons-material";
 import { useSession, signOut } from "next-auth/react";
-import Login from '@/components/forms/Login';
+import Login from "@/components/forms/Login";
+import Search from "@/components/ui/Search";
 
 const Header: React.FC = () => {
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
-  const [openLogin,setOpenLogin]=useState<boolean>(false);
+  const [openLogin, setOpenLogin] = useState<boolean>(false);
   const { data: session } = useSession();
   const openForm = () => {
     setOpenSignUpModal(true);
@@ -27,12 +28,12 @@ const Header: React.FC = () => {
   const closeForm = () => {
     setOpenSignUpModal(false);
   };
-  const openLoginForm= ()=>{
+  const openLoginForm = () => {
     setOpenLogin(true);
-  }
-  const closeLogin=()=>{
+  };
+  const closeLogin = () => {
     setOpenLogin(false);
-  }
+  };
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -40,12 +41,15 @@ const Header: React.FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const handleLogout=async ()=>{
+  const handleLogout = async () => {
     await signOut();
-  }
+  };
   return (
     <nav className="bg-[#3B3B3B] p-4 flex justify-between items-center">
       <div className="flex items-center space-x-4">
+        <div className="flex items-center">
+          <Image src={logo} alt="Company Logo" width={60} height={80} />
+        </div>
         <a className="text-white hover:text-gray-300" href="#">
           Home
         </a>
@@ -54,34 +58,8 @@ const Header: React.FC = () => {
             className="text-white hover:text-gray-300 inline-flex items-center"
             href="#"
           >
-            Courses
-            <IconButton
-              name="keyboard_arrow_down"
-              size="small"
-              className="ml-1"
-              disableRipple
-            >
-              <i className="fas fa-heart" />
-            </IconButton>
+            Library
           </a>
-          <ul className="absolute hidden text-gray-700 pt-1 group-hover:block">
-            <li>
-              <a
-                className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
-                href="#"
-              >
-                Submenu 1
-              </a>
-            </li>
-            <li>
-              <a
-                className="bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
-                href="#"
-              >
-                Submenu 2
-              </a>
-            </li>
-          </ul>
         </div>
         <a className="text-white hover:text-gray-300" href="#">
           About
@@ -90,36 +68,8 @@ const Header: React.FC = () => {
           Contact Us
         </a>
       </div>
-      <div className="flex items-center">
-        <Image src={logo} alt="Company Logo" width={40} height={50} />
-      </div>
       <div className="flex items-center space-x-4">
-        <div className="group inline-block relative text-white">
-          <IconButton
-            name="search"
-            size="small"
-            className="text-white"
-            disableRipple
-          >
-            <i className="fas fa-heart" />
-          </IconButton>
-          <TextField
-            className="absolute hidden bg-white text-black rounded p-1 group-hover:block"
-            placeholder="Search..."
-            type="text"
-          />
-        </div>
-        <IconButton
-          name="wb_sunny"
-          size="small"
-          className="text-white"
-          disableRipple
-        >
-          <i className="fas fa-heart" />
-        </IconButton>
-        <IconButton name="person" size="small" className="text-white">
-          <i className="fas fa-heart" />
-        </IconButton>
+        <Search/>
         {session ? (
           <div>
             <IconButton
@@ -177,17 +127,22 @@ const Header: React.FC = () => {
           </div>
         ) : (
           <>
-            <Button color="primary" variant="outlined" onClick={openLoginForm} disableRipple>
+            <Button
+              color="primary"
+              variant="outlined"
+              onClick={openLoginForm}
+              disableRipple
+            >
               Login
             </Button>
             <Login isOpen={openLogin} onClose={closeLogin} />
             <Button color="primary" variant="contained" onClick={openForm}>
               Sign Up
             </Button>
-            <SignUp 
-            isOpen={openSignUpModal} 
-            onClose={closeForm}
-            session={session}
+            <SignUp
+              isOpen={openSignUpModal}
+              onClose={closeForm}
+              session={session}
             />
           </>
         )}
