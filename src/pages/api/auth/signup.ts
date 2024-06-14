@@ -7,7 +7,6 @@ import { signIn } from "next-auth/react";
 import { resolve } from "path";
 import { rejects } from "assert";
 
-
 interface RequestBody {
   firstName: string;
   lastName: string;
@@ -20,7 +19,6 @@ export const config = {
     bodyParser: false,
   },
 };
-
 
 export default async function handler(
   req: NextApiRequest,
@@ -47,6 +45,7 @@ export default async function handler(
         const existingUser = await prisma.user.findUnique({
           where: { email: String(Email) },
         });
+        console.log(prisma);
         if (existingUser) {
           return res
             .status(400)
@@ -58,11 +57,11 @@ export default async function handler(
             lastName: String(LastName),
             email: String(Email),
             password: hashedPassword,
-            emailVerified:false,
-            isActive:true,
+            emailVerified: false,
+            isActive: true,
           },
         });
-        const otpSessionId=await sendVerificationRequest(String(Email));
+        const otpSessionId = await sendVerificationRequest(String(Email));
         res.status(200).json({ otpSessionId });
       } catch (error) {
         res.status(500).json({ error: "Failed to create user" });

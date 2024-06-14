@@ -3,19 +3,33 @@ import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import GoogleProvider from "next-auth/providers/google";
-
+import FacebookProvider from "next-auth/providers/facebook";
+import LinkedInProvider from "next-auth/providers/linkedin";
+import GitHubProvider from "next-auth/providers/github";
 
 const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID||'',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET||'',
-      authorization: 'https://accounts.google.com/o/oauth2/v2/auth',
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: "https://accounts.google.com/o/oauth2/v2/auth",
       // tokenUrl: 'https://oauth2.googleapis.com/token',
-      profileUrl: 'https://openidconnect.googleapis.com/v1/userinfo',
+      profileUrl: "https://openidconnect.googleapis.com/v1/userinfo",
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID || "",
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+    }),
+    LinkedInProvider({
+      clientId: process.env.LINKEDIN_CLIENT_ID || "",
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || "",
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     }),
     EmailProvider({
       server: process.env.EMAIL_SERVER_HOST,
@@ -39,16 +53,16 @@ const options: NextAuthOptions = {
         const user = await prisma.user.findUnique({
           where: { email },
         });
-        
+
         if (!user) {
           throw new Error("Invalid email or password");
         }
         if (!user.emailVerified) {
           throw new Error("Email not Verified");
         }
-        const isValidPassword = await bcrypt.compare(password,user.password );
+        const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-          throw new Error("Invalid email or password"); 
+          throw new Error("Invalid email or password");
         }
         return { ...user, id: user.id.toString() };
       },

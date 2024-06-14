@@ -143,9 +143,12 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
     setShowPassword((show) => !show);
   };
 
-  
-  const handleSocialSignup = (provider: string) => {
-    return null;
+  const handleSocialSignup = async (provider: string) => {
+    try {
+      await signIn(provider.toLowerCase(), { callbackUrl: "/" });
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
   };
   return (
     <>
