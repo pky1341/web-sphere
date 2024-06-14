@@ -23,8 +23,6 @@ import IconButton from "@mui/material/IconButton";
 import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 import OtpForm from "./OtpForm";
-import { useAuth0} from "@auth0/auth0-react";
-import { WebAuth } from '@auth0/web-auth';
 const dataValidation = z
   .object({
     FirstName: z.string().min(1, "First Name is Required"),
@@ -49,7 +47,6 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const [showOTPForm, setShowOTPForm] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const { loginWithRedirect } = useAuth0();
 
   const {
     register,
@@ -145,23 +142,10 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const handleShowPassword = () => {
     setShowPassword((show) => !show);
   };
-  const auth0=new WebAuth({
-    domain:process.env.AUTH0_DOMAIN,
-    clientId:process.env.AUTH0_CLIENT_ID,
-    redirectUri:process.env.AUTH0_REDIRECT_URI
-  });
-  const handleGoogleLogin = async () => {
-    await auth0.authorize({
-      audience: "https://web-sphere.auth0.com/api/v2/",
-      scope: "openid profile email",
-      response_type: "code",
-      redirect_uri: "http://localhost:3000",
-    });
-  };
+
+  
   const handleSocialSignup = (provider: string) => {
-    loginWithRedirect({
-      connection: provider,
-    });
+    return null;
   };
   return (
     <>
@@ -268,7 +252,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   startIcon={<GoogleIcon />}
                   className="mr-2 rounded-full"
                   style={{ backgroundColor: "#DB4437" }}
-                  onClick={handleGoogleLogin}
+                  onClick={() => handleSocialSignup("Google")}
                 >
                   Google
                 </Button>
