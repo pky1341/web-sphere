@@ -142,7 +142,6 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
   const handleShowPassword = () => {
     setShowPassword((show) => !show);
   };
-
   const handleSocialSignup = async (provider: string) => {
     try {
       await signIn(provider.toLowerCase(), { callbackUrl: "/" });
@@ -259,7 +258,6 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                 >
                   Google
                 </Button>
-
                 <Button
                   variant="contained"
                   color="primary"
@@ -286,7 +284,7 @@ const SignUp: React.FC<signUpFormProps> = ({ isOpen, onClose, session }) => {
                   variant="contained"
                   color="primary"
                   startIcon={<GitHubIcon />}
-                  onClick={() => handleSocialSignup("GitHub")}
+                  onClick={() => signIn("github", { callbackUrl: "/profile" })}
                   className="rounded-full"
                   style={{ backgroundColor: "#24292E" }}
                 >

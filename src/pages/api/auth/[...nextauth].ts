@@ -15,21 +15,44 @@ const options: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      authorization: "https://accounts.google.com/o/oauth2/v2/auth",
-      // tokenUrl: 'https://oauth2.googleapis.com/token',
-      profileUrl: "https://openidconnect.googleapis.com/v1/userinfo",
+      authorization: {
+        url: "https://accounts.google.com/o/oauth2/v2/auth",
+        params: {
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
+        },
+      },
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID || "",
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+      authorization: {
+        url: "https://www.facebook.com/v3.0/dialogs/oauth",
+        params: {
+          scope: "email,public_profile",
+        },
+      },
     }),
     LinkedInProvider({
       clientId: process.env.LINKEDIN_CLIENT_ID || "",
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET || "",
+      authorization: {
+        url: "https://www.linkedin.com/oauth/v2/authorization",
+        params: {
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/linkedin`,
+          scope: "r_liteprofile%20r_emailaddress",
+        },
+      },
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      authorization: {
+        url: "https://github.com/login/oauth/authorize",
+        params: {
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/github`,
+          scope: "user:email",
+        },
+      },
     }),
     EmailProvider({
       server: process.env.EMAIL_SERVER_HOST,
@@ -80,7 +103,7 @@ const options: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-      }
+      } 
       return token;
     },
     async session({ session, token }) {
@@ -88,6 +111,22 @@ const options: NextAuthOptions = {
         (session as any).id = token.id;
       }
       return session;
+    },
+    async signIn({ user, account, profile }) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: profile?.email },
+      });
+      if (!existingUser) {
+        const newUser = await prisma.user.create({
+          data: {
+            firstName: profile?.name,
+            email: profile?.email,
+            emailVerified: true,
+            isActive: true,
+          },
+        });
+      }
+      return true;
     },
   },
 };
