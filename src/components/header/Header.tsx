@@ -69,7 +69,7 @@ const Header: React.FC = () => {
         </a>
       </div>
       <div className="flex items-center space-x-4">
-        <Search/>
+        <Search />
         {session ? (
           <div>
             <IconButton

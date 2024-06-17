@@ -19,6 +19,7 @@ const options: NextAuthOptions = {
         url: "https://accounts.google.com/o/oauth2/v2/auth",
         params: {
           redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
+          scope: "email profile",
         },
       },
     }),
@@ -103,7 +104,7 @@ const options: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-      } 
+      }
       return token;
     },
     async session({ session, token }) {
@@ -117,14 +118,20 @@ const options: NextAuthOptions = {
         where: { email: profile?.email },
       });
       if (!existingUser) {
+        const fullName = profile?.name?.split(" ");
+        const firstName = fullName?.[0] ?? "";
+        const lastName = fullName?.[1] ?? "";
         const newUser = await prisma.user.create({
           data: {
-            firstName: profile?.name,
-            email: profile?.email,
+            firstName,
+            lastName,
+            email: profile?.email ?? "",
+            password: "",
             emailVerified: true,
             isActive: true,
           },
         });
+        return true;
       }
       return true;
     },

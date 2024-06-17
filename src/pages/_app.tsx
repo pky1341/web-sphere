@@ -21,9 +21,9 @@ interface AppProps {
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-      <ClientSessionProvider>
+    <ClientSessionProvider>
       <Component {...pageProps} />
-      </ClientSessionProvider>
+    </ClientSessionProvider>
   );
 }
 
