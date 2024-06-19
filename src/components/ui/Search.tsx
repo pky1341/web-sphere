@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import search from "@/images/Icons/search.png";
-import { Client as ElasticsearchClient } from "elasticsearch";
+import { Client as ElasticsearchClient } from "@elastic/elasticsearch";
 import { Modal, Input, List, ListItem } from "@mui/material";
 
 interface SearchHit {
